@@ -17,6 +17,7 @@ import NotFoundScreen from '../screens/NotFoundScreen';
 import ExploreScreen from '../screens/ExploreScreen';
 import ScheduleScreen from '../screens/ScheduleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import ServicesScreen from '../screens/ServicesScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -45,6 +46,7 @@ function RootNavigator() {
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
+        <Stack.Screen name="Services" component={ServicesScreen} options={{ title: '' }} />
       </Stack.Group>
     </Stack.Navigator>
   );
