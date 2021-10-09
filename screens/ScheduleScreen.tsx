@@ -33,8 +33,6 @@ const ScheduleScreen = () => {
 
   )
 
-
-
   /*  
   
   const loadItems = (day: any) => {
