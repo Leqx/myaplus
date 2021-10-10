@@ -6,9 +6,16 @@ import { Container, Heading, NativeBaseProvider, Center,Button } from 'native-ba
 import SearchBar from '../components/search/SearchBar';
 import UnitsSlider from '../components/unitsSlider/UnitsSlider';
 import { borderRadius } from 'styled-system';
-
+import ScheduleContext from '../context/schedule/schedule-context';
+import UnitsContext from '../context/units/units-context';
+import scheduleReducer from '../context/schedule/schedule-reducer';
+import unitsReducer from '../context/units/units-reducer';
 
 export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explore'>) {
+
+  const schedule = React.useContext(ScheduleContext)
+
+  const units = React.useContext(UnitsContext)
 
   const [sliderData, setSliderData] = React.useState([
     {
@@ -28,11 +35,15 @@ export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explor
         chapterCount: "9",
     },
 ])
+
+
   return (
+    
     <View style={styles.container}>
 
       <View style={styles.header}>
       <SearchBar/>
+      
       </View>
 
       <View style={styles.units}>

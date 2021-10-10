@@ -6,6 +6,8 @@ import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
 
+import ScheduleState from './context/schedule/ScheduleState';
+
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -16,8 +18,10 @@ export default function App() {
   } else {
     return (
       <SafeAreaProvider>
+        <ScheduleState>
         <Navigation colorScheme={colorScheme} />
         <StatusBar />
+        </ScheduleState>
       </SafeAreaProvider>
     );
   }

@@ -5,7 +5,6 @@ import { Actionsheet, useDisclose, NativeBaseProvider, Modal } from "native-base
 import { Text, View } from '../components/Themed';
 
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-import { paddingLeft } from 'styled-system';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -109,6 +108,9 @@ const ScheduleScreen = () => {
           style={styles.agenda}
           refreshControl={null}
           refreshing={false}
+          hideExtraDays={true}
+          theme={{calendarBackground: 'red', agendaKnobColor: 'green'}}
+          renderDay={(day, item) => (<Text>{day ? day.day: 'item'}</Text>)}
           markedDates={markedDates}
 
         />
