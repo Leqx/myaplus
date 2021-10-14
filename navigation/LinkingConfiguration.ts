@@ -33,6 +33,7 @@ const linking: LinkingOptions<RootStackParamList> = {
         },
       },
       Services: 'services',
+      CreateSchedule: 'create_schedule',
       Modal: 'modal',
       NotFound: '*',
 

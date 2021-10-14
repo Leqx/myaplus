@@ -1,8 +1,17 @@
 import * as React from 'react';
-import { StyleSheet,FlatList } from 'react-native';
+import {
+  StatusBar,
+  Image,
+  FlatList,
+  Dimensions,
+  Animated,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
-import { Container, Heading, NativeBaseProvider, Center,Button } from 'native-base';
+import { LinearGradient } from 'expo-linear-gradient';
+
 import SearchBar from '../components/search/SearchBar';
 import UnitsSlider from '../components/unitsSlider/UnitsSlider';
 import { borderRadius } from 'styled-system';
@@ -10,6 +19,15 @@ import ScheduleContext from '../context/schedule/schedule-context';
 import UnitsContext from '../context/units/units-context';
 import scheduleReducer from '../context/schedule/schedule-reducer';
 import unitsReducer from '../context/units/units-reducer';
+
+const { width } = Dimensions.get('screen');
+
+const OVERFLOW_HEIGHT = 70;
+const SPACING = 10;
+const ITEM_WIDTH = width * 0.66;
+const ITEM_HEIGHT = ITEM_WIDTH * 1.7;
+const VISIBLE_ITEMS = 3;
+
 
 export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explore'>) {
 
@@ -35,8 +53,6 @@ export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explor
         chapterCount: "9",
     },
 ])
-
-
   return (
     
     <View style={styles.container}>
@@ -53,22 +69,30 @@ export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explor
         scrollEnabled={true}
         showsHorizontalScrollIndicator={false} 
         snapToEnd={true}
+        contentContainerStyle={{
+              padding: SPACING * 2,
+              marginTop: 10,
+            }}
+        removeClippedSubviews={false}
         renderItem={({ item }) => (
+          
           <View style={styles.slider}>
-            <View >
+             <LinearGradient
+               colors={['rgba(0,0,0,0.8)', 'transparent']}
+               style={styles.background}
+               />
+            <View  style={styles.titleContainer} >
             <Text style={styles.title}>{item.title} </Text>
             </View>
 
-            <View>
-            <Text style={styles.count}>{item.chapterCount} </Text>
+            <View style={styles.countContainer}>
+            <Text style={styles.count}>{item.chapterCount} Chapters </Text>
             </View>
           </View>
         )}
         keyExtractor={item => item.title}
         />
       </View>
-
-     
     </View>
   );
 }
@@ -81,13 +105,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 25,
-    fontWeight: 'bold',
-    paddingLeft: 10 ,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: -1,
+    paddingHorizontal:  10
   },
   count: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: 'normal',
-    paddingLeft: 10 ,
+    paddingLeft: 12 ,
     paddingTop: 10,
     paddingBottom: 10
   },
@@ -107,20 +133,41 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50 ,
         padding: 20,
-        borderRadius: 16
+        borderRadius: 26
     },
     itemText:{
         color: "#000"
     },
     slider:{
       padding: 10,
-      backgroundColor: 'blue',
-      borderRadius: 10,
+      borderRadius: 20,
       margin: 10,
       width: 300,
       height: 300,
       flex: 0.5,
       justifyContent: "center",
-      flexDirection: 'column'
-    }
+      flexDirection: 'column',
+    },
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 300,
+    borderRadius: 20,
+  },
+  titleContainer:{
+   borderTopRightRadius: 10,
+   borderTopLeftRadius: 10,
+   flex: 0.2,
+   justifyContent: 'center',
+   alignItems: 'center'
+  },
+  countContainer:{
+   borderBottomRightRadius: 10,
+   borderBottomLeftRadius: 10,
+   flex: 0.2,
+   justifyContent: 'center',
+   alignItems: 'center'
+  }
 });

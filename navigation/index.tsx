@@ -18,10 +18,12 @@ import ExploreScreen from '../screens/ExploreScreen';
 import ScheduleScreen from '../screens/ScheduleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import ServicesScreen from '../screens/ServicesScreen';
+import CreateScheduleScreen from '../screens/CreateScheduleScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
 import { Ionicons } from '@expo/vector-icons';
+
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -50,6 +52,17 @@ function RootNavigator() {
       </Stack.Group>
     </Stack.Navigator>
   );
+}
+
+const ScheduleStack = createNativeStackNavigator();
+
+function ScheduleStackNavigator(){
+  return(
+    <ScheduleStack.Navigator >
+       <ScheduleStack.Screen name="Schedule" component={ScheduleScreen}  options={{ headerShown: false }}/>
+      <ScheduleStack.Screen name="CreateSchedule" component={CreateScheduleScreen} options={{ headerShown: false }} />
+    </ScheduleStack.Navigator>
+  )
 }
 
 /**
@@ -97,7 +110,7 @@ function BottomTabNavigator() {
       />
       <BottomTab.Screen
         name="Schedule"
-        component={ScheduleScreen}
+        component={ScheduleStackNavigator}
         options={{
           title: 'Schedule',
           headerShown: false,
