@@ -14,7 +14,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import SearchBar from '../components/search/SearchBar';
 import UnitsSlider from '../components/unitsSlider/UnitsSlider';
-import { borderRadius } from 'styled-system';
 import ScheduleContext from '../context/schedule/schedule-context';
 import UnitsContext from '../context/units/units-context';
 import scheduleReducer from '../context/schedule/schedule-reducer';

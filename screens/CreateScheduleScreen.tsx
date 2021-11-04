@@ -17,6 +17,7 @@ import moment from 'moment';
 import * as Calendar from 'expo-calendar';
 import * as Localization from 'expo-localization';
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { RootStackParamList } from '../types';
 import useStore from '../store/store';
@@ -134,7 +135,7 @@ export default function CreateSchedule({ navigation,route}: any) {
         ]
       }
     };
-    navigation.navigate('Home');
+    navigation.navigate('Schedule');
     await updateTodo(creatTodo);
     updateCurrentTask(currentDate);
   };

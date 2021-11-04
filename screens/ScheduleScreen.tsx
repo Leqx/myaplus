@@ -3,6 +3,7 @@ import {
   Alert,
   Dimensions,
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   Switch,
@@ -15,13 +16,13 @@ import {  CalendarList } from 'react-native-calendars';
 import moment from 'moment';
 import * as Calendar from 'expo-calendar';
 import * as Localization from 'expo-localization';
+import Task from '../components/task/Task';
 
 import CalendarStrip from 'react-native-calendar-strip';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import { Task } from '../components/task/Task';
-// import { useStore } from '../store';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootTabScreenProps } from '../types';
+import useStore from '../store/store';
 
 const datesWhitelist = [
   {
@@ -32,6 +33,14 @@ const datesWhitelist = [
 
 const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
 
+    const { updateSelectedTask, deleteSelectedTask, todo } = useStore(
+    (state: { updateSelectedTask: any; deleteSelectedTask: any; todo: any; }) => ({
+      updateSelectedTask: state.updateSelectedTask,
+      deleteSelectedTask: state.deleteSelectedTask,
+      todo: state.todo
+    })
+  );
+
     const [todoList, setTodoList] = useState([]);
     const [markedDate, setMarkedDate] = useState([]);
     const [currentDate, setCurrentDate] = useState(
@@ -40,9 +49,385 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     )}`
   );
 
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isDateTimePickerVisible, setDateTimePickerVisible] = useState(false);
+
+  useEffect(() => {
+    handleDeletePreviousDayTask(todo);
+  }, [todo, currentDate]);
+
+  const handleDeletePreviousDayTask = async (oldTodo: any[]) => {
+    try {
+      if (oldTodo !== []) {
+        const todayDate = `${moment().format('YYYY')}-${moment().format(
+          'MM'
+        )}-${moment().format('DD')}`;
+        const checkDate = moment(todayDate);
+        await oldTodo.filter((item: { date: moment.MomentInput; todoList: any[]; }) => {
+          const currDate = moment(item.date);
+          const checkedDate = checkDate.diff(currDate, 'days');
+          if (checkedDate > 0) {
+            item.todoList.forEach(async (listValue: { alarm: { createEventAsyncRes: { toString: () => string; }; }; }) => {
+              try {
+                await Calendar.deleteEventAsync(
+                  listValue.alarm.createEventAsyncRes.toString()
+                );
+              } catch (error) {
+                console.log(error);
+              }
+            });
+            return false;
+          }
+          return true;
+        });
+
+        // await AsyncStorage.setItem('TODO', JSON.stringify(updatedList));
+        updateCurrentTask(currentDate);
+      }
+    } catch (error) {
+      // Error retrieving data
+    }
+  };
+
+  const handleModalVisible = () => {
+    setModalVisible(!isModalVisible);
+   };
+  
+  const updateCurrentTask = async (currentDate: string) => {
+    try {
+      if (todo !== [] && todo) {
+        const markDot = todo.map((item: { markedDot: any; }) => item.markedDot);
+        const todoLists = todo.filter((item: { date: any; }) => {
+          if (currentDate === item.date) {
+            return true;
+          }
+          return false;
+        });
+        setMarkedDate(markDot);
+        if (todoLists.length !== 0) {
+          setTodoList(todoLists[0].todoList);
+        } else {
+          setTodoList([]);
+        }
+      }
+    } catch (error) {
+      console.log('updateCurrentTask', error.message);
+    }
+  };
+
+    const showDateTimePicker = () => setDateTimePickerVisible(true);
+
+  const hideDateTimePicker = () => setDateTimePickerVisible(false);
+
+  const handleDatePicked = (date: moment.MomentInput) => {
+    let prevSelectedTask = JSON.parse(JSON.stringify(selectedTask));
+    const selectedDatePicked = prevSelectedTask.alarm.time;
+    const hour = moment(date).hour();
+    const minute = moment(date).minute();
+    let newModifiedDay = moment(selectedDatePicked).hour(hour).minute(minute);
+    prevSelectedTask.alarm.time = newModifiedDay;
+    setSelectedTask(prevSelectedTask);
+    hideDateTimePicker();
+  };
+
+  const handleAlarmSet = () => {
+    let prevSelectedTask = JSON.parse(JSON.stringify(selectedTask));
+    prevSelectedTask.alarm.isOn = !prevSelectedTask.alarm.isOn;
+    setSelectedTask(prevSelectedTask);
+  };
+
+    const updateAlarm = async () => {
+    const calendarId = await createNewCalendar();
+    const event = {
+      title: selectedTask.title,
+      notes: selectedTask.notes,
+      startDate: moment(selectedTask?.alarm.time).add(0, 'm').toDate(),
+      endDate: moment(selectedTask?.alarm.time).add(5, 'm').toDate(),
+      timeZone: Localization.timezone
+    };
+
+    if (!selectedTask?.alarm.createEventAsyncRes) {
+      try {
+        const createEventAsyncRes = await Calendar.createEventAsync(
+          calendarId.toString(),
+          event
+        );
+        let updateTask = JSON.parse(JSON.stringify(selectedTask));
+        updateTask.alarm.createEventAsyncRes = createEventAsyncRes;
+        setSelectedTask(updateTask);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        await Calendar.updateEventAsync(
+          selectedTask?.alarm.createEventAsyncRes.toString(),
+          event
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+    const deleteAlarm = async () => {
+    try {
+      if (selectedTask?.alarm.createEventAsyncRes) {
+        await Calendar.deleteEventAsync(
+          selectedTask?.alarm.createEventAsyncRes
+        );
+      }
+      let updateTask = JSON.parse(JSON.stringify(selectedTask));
+      updateTask.alarm.createEventAsyncRes = '';
+      setSelectedTask(updateTask);
+    } catch (error) {
+      console.log('deleteAlarm', error.message);
+    }
+  };
+
+  const createNewCalendar = async () => {
+    const defaultCalendarSource =
+      Platform.OS === 'ios'
+        ? await Calendar.getDefaultCalendarAsync(Calendar.EntityTypes.EVENT)
+        : { isLocalAccount: true, name: 'Google Calendar' };
+
+    const newCalendar = {
+      title: 'Personal',
+      entityType: Calendar.EntityTypes.EVENT,
+      color: '#2196F3',
+      sourceId: defaultCalendarSource?.sourceId || undefined,
+      source: defaultCalendarSource,
+      name: 'internal',
+      accessLevel: Calendar.CalendarAccessLevel.OWNER,
+      ownerAccount: 'personal'
+    };
+
+    let calendarId = null;
+
+    try {
+      calendarId = await Calendar.createCalendarAsync(newCalendar);
+    } catch (e) {
+      Alert.alert(e.message);
+    }
+
+    return calendarId;
+  };
+
+  const getEvent = async () => {
+    if (selectedTask?.alarm.createEventAsyncRes) {
+      try {
+        await Calendar.getEventAsync(
+          selectedTask?.alarm.createEventAsyncRes.toString()
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+
+
+
+
   return (
+    <>
     <NativeBaseProvider>
-      <View style={styles.container}>
+      {selectedTask !== null && (
+        <Task {...{ setModalVisible, isModalVisible }}>
+          <DateTimePicker
+            isVisible={isDateTimePickerVisible}
+            onConfirm={handleDatePicked}
+            onCancel={hideDateTimePicker}
+            mode="time"
+            date={new Date()}
+            isDarkModeEnabled
+          />
+          <View style={styles.taskContainer}>
+            <TextInput
+              style={styles.title}
+              onChangeText={(text) => {
+                let prevSelectedTask = JSON.parse(JSON.stringify(selectedTask));
+                prevSelectedTask.title = text;
+                setSelectedTask(prevSelectedTask);
+              }}
+              value={selectedTask.title}
+              placeholder="What do you need to do?"
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#BDC6D8',
+                marginVertical: 10
+              }}
+            >
+              Suggestion
+            </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={styles.readBook}>
+                <Text style={{ textAlign: 'center', fontSize: 14 }}>
+                  Read book
+                </Text>
+              </View>
+              <View style={styles.design}>
+                <Text style={{ textAlign: 'center', fontSize: 14 }}>
+                  Design
+                </Text>
+              </View>
+              <View style={styles.learn}>
+                <Text style={{ textAlign: 'center', fontSize: 14 }}>Learn</Text>
+              </View>
+            </View>
+            <View style={styles.notesContent} />
+            <View>
+              <Text
+                style={{
+                  color: '#9CAAC4',
+                  fontSize: 16,
+                  fontWeight: '600'
+                }}
+              >
+                Notes
+              </Text>
+              <TextInput
+                style={{
+                  height: 25,
+                  fontSize: 19,
+                  marginTop: 3
+                }}
+                onChangeText={(text) => {
+                  let prevSelectedTask = JSON.parse(
+                    JSON.stringify(selectedTask)
+                  );
+                  prevSelectedTask.notes = text;
+                  setSelectedTask(prevSelectedTask);
+                }}
+                value={selectedTask.notes}
+                placeholder="Enter notes about the task."
+              />
+            </View>
+            <View style={styles.separator} />
+            <View>
+              <Text
+                style={{
+                  color: '#9CAAC4',
+                  fontSize: 16,
+                  fontWeight: '600'
+                }}
+              >
+                Times
+              </Text>
+              <TouchableOpacity
+                onPress={() => showDateTimePicker()}
+                style={{
+                  height: 25,
+                  marginTop: 3
+                }}
+              >
+                <Text style={{ fontSize: 19 }}>
+                  {moment(selectedTask?.alarm?.time || moment()).format(
+                    'h:mm A'
+                  )}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.separator} />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+            >
+              <View>
+                <Text
+                  style={{
+                    color: '#9CAAC4',
+                    fontSize: 16,
+                    fontWeight: '600'
+                  }}
+                >
+                  Alarm
+                </Text>
+                <View
+                  style={{
+                    height: 25,
+                    marginTop: 3
+                  }}
+                >
+                  <Text style={{ fontSize: 19 }}>
+                    {moment(selectedTask?.alarm?.time || moment()).format(
+                      'h:mm A'
+                    )}
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={selectedTask?.alarm?.isOn || false}
+                onValueChange={handleAlarmSet}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
+            >
+              <TouchableOpacity
+                onPress={async () => {
+                  handleModalVisible();
+                  console.log('isOn', selectedTask?.alarm.isOn);
+                  if (selectedTask?.alarm.isOn) {
+                    await updateAlarm();
+                  } else {
+                    await deleteAlarm();
+                  }
+                  await updateSelectedTask({
+                    date: currentDate,
+                    todo: selectedTask
+                  });
+                  updateCurrentTask(currentDate);
+                }}
+                style={styles.updateButton}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    textAlign: 'center',
+                    color: '#fff'
+                  }}
+                >
+                  UPDATE
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={async () => {
+                  handleModalVisible();
+                  deleteAlarm();
+                  await deleteSelectedTask({
+                    date: currentDate,
+                    todo: selectedTask
+                  });
+                  updateCurrentTask(currentDate);
+                }}
+                style={styles.deleteButton}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    textAlign: 'center',
+                    color: '#fff'
+                  }}
+                >
+                  DELETE
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Task>
+      )}
+      <SafeAreaView style={styles.container}>
          <CalendarStrip
           calendarAnimation={{ type: 'sequence', duration: 30 }}
           daySelectionAnimation={{
@@ -93,7 +478,11 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
 
           <TouchableOpacity
           onPress={() =>
-            navigation.navigate('CreateSchedule')
+            navigation.navigate('CreateSchedule', {
+              updateCurrentTask: updateCurrentTask,
+              currentDate,
+              createNewCalendar: createNewCalendar
+            })
           }
           style={styles.viewTask}
         >
@@ -105,8 +494,101 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
             }}
           />
         </TouchableOpacity>
-      </View>
+                <View
+          style={{
+            width: '100%',
+            height: Dimensions.get('window').height - 170
+          }}
+        >
+          <ScrollView
+            contentContainerStyle={{
+              paddingBottom: 20
+            }}
+          >
+            {todoList.map((item) => (
+              <TouchableOpacity
+                onPress={() => {
+                  setSelectedTask(item);
+                  setModalVisible(true);
+                  getEvent();
+                }}
+                key={item.key}
+                style={styles.taskListContent}
+              >
+                <View
+                  style={{
+                    marginLeft: 13
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <View
+                      style={{
+                        height: 12,
+                        width: 12,
+                        borderRadius: 6,
+                        backgroundColor: item.color,
+                        marginRight: 8
+                      }}
+                    />
+                    <Text
+                      style={{
+                        color: '#554A4C',
+                        fontSize: 20,
+                        fontWeight: '700'
+                      }}
+                    >
+                      {item.title}
+                    </Text>
+                  </View>
+                  <View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        marginLeft: 20
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: '#BBBBBB',
+                          fontSize: 14,
+                          marginRight: 5
+                        }}
+                      >{`${moment(item.alarm.time).format('YYYY')}/${moment(
+                        item.alarm.time
+                      ).format('MM')}/${moment(item.alarm.time).format(
+                        'DD'
+                      )}`}</Text>
+                      <Text
+                        style={{
+                          color: '#BBBBBB',
+                          fontSize: 14
+                        }}
+                      >
+                        {item.notes}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    height: 80,
+                    width: 5,
+                    backgroundColor: item.color,
+                    borderRadius: 5
+                  }}
+                />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </SafeAreaView>
     </NativeBaseProvider>
+    </>
   );
 }
 
@@ -116,7 +598,7 @@ export default ScheduleScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50
+    paddingTop: 10
   },
   item: {
     backgroundColor: 'white',
@@ -261,3 +743,15 @@ const styles = StyleSheet.create({
   }
   
 });
+function handleDeletePreviousDayTask(todo: any) {
+  throw new Error('Function not implemented.');
+}
+
+function updateCurrentTask(selectedDate: string) {
+  throw new Error('Function not implemented.');
+}
+
+function createNewCalendar() {
+  throw new Error('Function not implemented.');
+}
+
