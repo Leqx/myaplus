@@ -1,44 +1,91 @@
-import React from 'react'
-import { StyleSheet, TouchableOpacity } from 'react-native'
+import React, { useContext } from 'react'
+import { StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { Text, View } from '../../components/Themed';
+import { View } from '../../components/Themed';
+// import { supabase } from "../../initSupabase";
 
 import { useNavigation } from '@react-navigation/native';
+
+const {width,height} = Dimensions.get('window')
+
+import {
+  Layout,
+  Button,
+  Text,
+  TopNav,
+  Section,
+  SectionContent,
+  useTheme,
+  themeColor,
+} from "react-native-rapi-ui";
+import { auth } from '../../initFirebase';
+
 
 
 export default function Settings() {
 
     const navigation = useNavigation();
 
+    const { isDarkmode, setTheme } = useTheme();
+
+    const signOut = async () => {
+
+  await auth.signOut();
+
+  };
+
+                // async () => {
+                // const { error } = await supabase.auth.signOut();
+                // if (!error) {
+                //   alert("Signed out!");
+                // }
+                // if (error) {
+                //   alert(error.message);
+                // }
+                
+                // }
+
     return (
-        <View style={styles.container}>
-            <View style={styles.titleWrapper}>
-                <Text style={styles.title}>Account Settings</Text>
-            </View>
-            <View style={styles.settingsContainer}>
+        <Section style={styles.container}>
+            <Section style={styles.titleWrapper}>
+                <Text style={styles.title} size='sm' >Account Settings</Text>
+            </Section>
+            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+            <Section style={styles.settingsContainer}>
 
                 <TouchableOpacity
                     style={styles.wrapper}
                     onPress={() => navigation.navigate('Services')}
                 >
-                    <Text>Services</Text>
-                    <FontAwesome name="handshake-o" size={24} color="black" />
+                    <Text size='md' >Services</Text>
+                    <FontAwesome name="handshake-o" size={18} color={isDarkmode ? themeColor.white : themeColor.black}  />
                 </TouchableOpacity>
                 <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
 
-                <View style={styles.wrapper}>
-                    <Text>Notifications</Text>
-                    <Ionicons name="ios-notifications-outline" size={24} color="black" />
-                </View>
+                <TouchableOpacity style={styles.wrapper}>
+                    <Text size='md'>Notifications</Text>
+                    <Ionicons name="ios-notifications-outline" size={18} color={isDarkmode ? themeColor.white : themeColor.black} />
+                </TouchableOpacity>
                 <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
 
-                <View style={styles.wrapper}>
-                    <Text>Dark Mode</Text>
-                    <Ionicons name="ios-moon-outline" size={24} color="black" />
-                </View>
+                <TouchableOpacity style={styles.wrapper}
+                onPress={() => {
+                  isDarkmode ? setTheme("light") : setTheme("dark");
+                }}
+                >
+                    <Text size='md'>{isDarkmode ? "☀️ Light mode" : "🌑 Dark mode"}</Text>
+                    <Ionicons name={isDarkmode ? "sunny" : "moon"} size={18} color={isDarkmode ? themeColor.white : themeColor.black} />
+                </TouchableOpacity>
                 <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-            </View>
-        </View>
+
+                <TouchableOpacity style={styles.wrapper}
+                onPress={signOut}
+                >
+                    <Text size='md'>Sign Out</Text>
+                </TouchableOpacity>
+                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+            </Section>
+        </Section>
     )
 }
 
@@ -46,22 +93,20 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: "column",
-        width: 320,
-        height: 100,
+        width: width,
+        height: 150,
     },
     titleWrapper: {
         height: 30,
     },
     title: {
-        fontSize: 12,
         fontWeight: 'normal',
         textTransform: "uppercase",
-        color: "#222",
         padding: 10
     },
     wrapper: {
         flex: 1,
-        width: "100%",
+        width: width,
         flexDirection: 'row',
         padding: 10,
         justifyContent: 'space-between',
@@ -72,10 +117,10 @@ const styles = StyleSheet.create({
     separator: {
         marginVertical: 10,
         height: 1,
-        width: '100%',
+        width: width,
     },
     settingsContainer: {
-        height: 150,
-        paddingTop: 10
+        height: 200,
+        paddingTop: 0
     }
 })

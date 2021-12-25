@@ -1,15 +1,10 @@
-import React, { useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import {
-  ScrollView,
-  TouchableOpacity,
-  View,
-  KeyboardAvoidingView,
-  Image,
-} from "react-native";
-import { supabase } from "../../initSupabase";
-import { AuthStackParamList } from "../../types/navigation";
-import { StackScreenProps } from "@react-navigation/stack";
+import React, { useRef, useState } from "react";
+import { StatusBar } from 'expo-status-bar';
+import { Platform, StyleSheet,ScrollView, TouchableOpacity,Image,KeyboardAvoidingView, Dimensions } from 'react-native';
+import {  View } from '../components/Themed';
+import { supabase } from "../initSupabase";
+import { AuthStackParamList } from "../types";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
   Layout,
@@ -18,31 +13,55 @@ import {
   Button,
   useTheme,
   themeColor,
+  Section,
+  SectionImage
 } from "react-native-rapi-ui";
+import { auth } from "../initFirebase";
+
+
+const { width } = Dimensions.get('screen');
+
+
 
 export default function ({
   navigation,
-}: StackScreenProps<AuthStackParamList, "Login">) {
+}: NativeStackScreenProps<AuthStackParamList, "Login">) {
   const { isDarkmode, setTheme } = useTheme();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function login() {
-    setLoading(true);
-    const { user, error } = await supabase.auth.signIn({
-      email: email,
-      password: password,
-    });
-    if (!error && !user) {
-      setLoading(false);
-      alert("Check your email for the login link!");
-    }
-    if (error) {
-      setLoading(false);
-      alert(error.message);
-    }
+  // const emailRef = useRef<HTMLInputElement>(null);
+  // const passwordRef = useRef<HTMLInputElement>(null);
+
+  const signIn = async () => {
+  try {
+    await auth.signInWithEmailAndPassword(
+      email,
+      password
+    );
+  } catch (error) {
+    console.error(error);
   }
+};
+ 
+  // async function login() {
+  //   setLoading(true);
+  //   const { user, error } = await supabase.auth.signIn({
+  //     email: email,
+  //     password: password,
+  //   });
+  //   if (!error && !user) {
+  //     setLoading(false);
+  //     alert("Check your email for the login link!");
+  //   }
+  //   if (error) {
+  //     setLoading(false);
+  //     alert(error.message);
+  //   }
+  // }
+        
+
   return (
     <KeyboardAvoidingView behavior="height" enabled style={{ flex: 1 }}>
       <Layout>
@@ -51,23 +70,27 @@ export default function ({
             flexGrow: 1,
           }}
         >
-          <View
+          <Section
             style={{
-              flex: 1,
+              flex: 0,
               justifyContent: "center",
               alignItems: "center",
               backgroundColor: isDarkmode ? "#17171E" : themeColor.white100,
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0              
+
             }}
           >
-            <Image
+
+            <SectionImage
               resizeMode="contain"
               style={{
                 height: 220,
                 width: 220,
               }}
-              source={require("../../../assets/images/login.png")}
+            source={isDarkmode ? require("../assets/images/Japan---mt.-fuji-night-.png") : require("../assets/images/Japan---mt.-fuji.png")}
             />
-          </View>
+          </Section>
           <View
             style={{
               flex: 3,
@@ -111,9 +134,7 @@ export default function ({
             />
             <Button
               text={loading ? "Loading" : "Continue"}
-              onPress={() => {
-                login();
-              }}
+              onPress={signIn}
               style={{
                 marginTop: 20,
               }}
@@ -124,8 +145,11 @@ export default function ({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 15,
+                marginTop: 25,
+                marginBottom: 25,
                 justifyContent: "center",
+                padding: 5,
+                backgroundColor: 'transparent'
               }}
             >
               <Text size="md">Don't have an account?</Text>
@@ -139,9 +163,10 @@ export default function ({
                   fontWeight="bold"
                   style={{
                     marginLeft: 5,
+                    color: themeColor.primary
                   }}
                 >
-                  Register here
+                  Create Here
                 </Text>
               </TouchableOpacity>
             </View>
@@ -151,15 +176,19 @@ export default function ({
                 alignItems: "center",
                 marginTop: 10,
                 justifyContent: "center",
+                backgroundColor: 'transparent',
               }}
             >
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("ForgetPassword");
+                  navigation.navigate("ForgotPassword");
                 }}
               >
-                <Text size="md" fontWeight="bold">
-                  Forget password
+                <Text size="md" fontWeight='light' style={{
+                    marginLeft: 5,
+                    color: themeColor.primary300
+                  }}>
+                  Oops!Forgot My Password? Recover Here
                 </Text>
               </TouchableOpacity>
             </View>
@@ -169,6 +198,7 @@ export default function ({
                 alignItems: "center",
                 marginTop: 30,
                 justifyContent: "center",
+                backgroundColor: 'transparent'
               }}
             >
               <TouchableOpacity
@@ -181,9 +211,11 @@ export default function ({
                   fontWeight="bold"
                   style={{
                     marginLeft: 5,
+                    marginTop: 10,
+                    color: themeColor.gray100
                   }}
                 >
-                  {isDarkmode ? "☀️ light theme" : "🌑 dark theme"}
+                  {isDarkmode ? "☀️ set light mode" : "🌑 set dark mode"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -193,3 +225,4 @@ export default function ({
     </KeyboardAvoidingView>
   );
 }
+

@@ -6,8 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
-  Text,
-  TextInput,
   TouchableOpacity,
   View,
   SafeAreaView
@@ -22,6 +20,17 @@ import { v4 as uuidv4 } from 'uuid';
 import { RootStackParamList } from '../types';
 import useStore from '../store/store';
 import useKeyboardHeight from '../hooks/useKeyboardHeight';
+import {
+  Layout,
+  Button,
+  Text,
+  TopNav,
+  Section,
+  SectionContent,
+  useTheme,
+  themeColor,
+  TextInput
+} from "react-native-rapi-ui";
 
 const { width: vw } = Dimensions.get('window');
 
@@ -149,9 +158,10 @@ export default function CreateSchedule({ navigation,route}: any) {
     hideDateTimePicker();
   };
 
+  const { isDarkmode, setTheme } = useTheme();
 
     return (
-    <Fragment>
+    <Layout>
       <DateTimePicker
         isVisible={isDateTimePickerVisible}
         onConfirm={handleDatePicked}
@@ -161,8 +171,8 @@ export default function CreateSchedule({ navigation,route}: any) {
         isDarkModeEnabled
       />
 
-      <SafeAreaView style={styles.container}>
-        <View
+      <Section style={styles.container}>
+        <Section
           style={{
             height: visibleHeight
           }}
@@ -186,12 +196,13 @@ export default function CreateSchedule({ navigation,route}: any) {
 
               <Text style={styles.newTask}>New Task</Text>
             </View>
-            <View style={styles.calenderContainer}>
+            <Section style={styles.calenderContainer}>
               <CalendarList
                 style={{
                   width: 350,
                   height: 350
                 }}
+                isDarkModeEnable
                 current={currentDay}
                 minDate={moment().format()}
                 horizontal
@@ -212,26 +223,27 @@ export default function CreateSchedule({ navigation,route}: any) {
                 hideArrows
                 markingType="custom"
                 theme={{
-                  selectedDayBackgroundColor: '#2E66E7',
-                  selectedDayTextColor: '#ffffff',
+                  selectedDayBackgroundColor: themeColor.primary,
+                  selectedDayTextColor: themeColor.white,
                   todayTextColor: '#2E66E7',
                   backgroundColor: '#eaeef7',
-                  calendarBackground: '#eaeef7',
+                  calendarBackground: themeColor.gray100,
                   textDisabledColor: '#d9dbe0'
                 }}
                 markedDates={selectedDay}
               />
-            </View>
-            <View style={styles.taskContainer}>
+            </Section>
+            <Section style={styles.taskContainer}>
+              <Text size='lg' style={{ marginBottom: 10, color: themeColor.white, }}>What do you need to study?</Text>
               <TextInput
                 style={styles.title}
                 onChangeText={setTaskText}
                 value={taskText}
-                placeholder="What do you need to do?"
+                placeholder="Enter Unit to study"
               />
               <Text
+                size='md'
                 style={{
-                  fontSize: 14,
                   color: '#BDC6D8',
                   marginVertical: 10
                 }}
@@ -241,23 +253,23 @@ export default function CreateSchedule({ navigation,route}: any) {
               <View style={{ flexDirection: 'row' }}>
                 <View style={styles.readBook}>
                   <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                    Read book
+                    Math
                   </Text>
                 </View>
                 <View style={styles.design}>
                   <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                    Design
+                    Phy
                   </Text>
                 </View>
                 <View style={styles.learn}>
                   <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                    Learn
+                    Bus
                   </Text>
                 </View>
               </View>
               <View style={styles.notesContent} />
-              <View>
-                <Text style={styles.notes}>Notes</Text>
+              <Section>
+                <Text size='lg' style={styles.notes}>Additional info</Text>
                 <TextInput
                   style={{
                     height: 25,
@@ -266,11 +278,11 @@ export default function CreateSchedule({ navigation,route}: any) {
                   }}
                   onChangeText={setNotesText}
                   value={notesText}
-                  placeholder="Enter notes about the task."
+                  placeholder="Enter more info about the task."
                 />
-              </View>
+              </Section>
               <View style={styles.separator} />
-              <View>
+              <Section>
                 <Text
                   style={{
                     color: '#9CAAC4',
@@ -278,7 +290,7 @@ export default function CreateSchedule({ navigation,route}: any) {
                     fontWeight: '600'
                   }}
                 >
-                  Times
+                  Set Times
                 </Text>
                 <TouchableOpacity
                   onPress={() => showDateTimePicker()}
@@ -291,24 +303,24 @@ export default function CreateSchedule({ navigation,route}: any) {
                     {moment(alarmTime).format('h:mm A')}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </Section>
               <View style={styles.separator} />
-              <View
+              <Section
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}
               >
-                <View>
+                <Section>
                   <Text
+                  size='lg'
                     style={{
                       color: '#9CAAC4',
-                      fontSize: 16,
                       fontWeight: '600'
                     }}
                   >
-                    Alarm
+                      Set Alarm
                   </Text>
                   <View
                     style={{
@@ -320,10 +332,10 @@ export default function CreateSchedule({ navigation,route}: any) {
                       {moment(alarmTime).format('h:mm A')}
                     </Text>
                   </View>
-                </View>
+                </Section>
                 <Switch value={isAlarmSet} onValueChange={handleAlarmSet} />
-              </View>
-            </View>
+              </Section>
+            </Section>
             <TouchableOpacity
               disabled={taskText === ''}
               style={[
@@ -343,8 +355,8 @@ export default function CreateSchedule({ navigation,route}: any) {
               }}
             >
               <Text
+              size='md'
                 style={{
-                  fontSize: 18,
                   textAlign: 'center',
                   color: '#fff'
                 }}
@@ -353,9 +365,9 @@ export default function CreateSchedule({ navigation,route}: any) {
               </Text>
             </TouchableOpacity>
           </ScrollView>
-        </View>
-      </SafeAreaView>
-    </Fragment>
+        </Section>
+      </Section>
+    </Layout>
     )
 }
 
@@ -378,7 +390,8 @@ const styles = StyleSheet.create({
   notes: {
     color: '#9CAAC4',
     fontSize: 16,
-    fontWeight: '600'
+    fontWeight: '600',
+    marginBottom: 10
   },
   notesContent: {
     height: 0.5,
@@ -418,8 +431,8 @@ const styles = StyleSheet.create({
     fontSize: 19
   },
   taskContainer: {
-    height: 400,
-    width: 327,
+    height: 500,
+    width: 337,
     alignSelf: 'center',
     borderRadius: 20,
     shadowColor: '#2E66E7',

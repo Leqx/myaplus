@@ -1,15 +1,10 @@
-import React, { useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import {
-  ScrollView,
-  TouchableOpacity,
-  View,
-  KeyboardAvoidingView,
-  Image,
-} from "react-native";
-import { supabase } from "../../initSupabase";
-import { AuthStackParamList } from "../../types/navigation";
-import { StackScreenProps } from "@react-navigation/stack";
+import React, { useRef, useState } from "react";
+import { StatusBar } from 'expo-status-bar';
+import { Platform, StyleSheet,ScrollView, TouchableOpacity,Image,KeyboardAvoidingView } from 'react-native';
+import { View } from '../components/Themed';
+import { supabase } from "../initSupabase";
+import { AuthStackParamList } from "../types";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   Layout,
   Text,
@@ -17,31 +12,47 @@ import {
   Button,
   useTheme,
   themeColor,
+  Section,
+  SectionImage
 } from "react-native-rapi-ui";
+import { auth } from "../initFirebase";
 
 export default function ({
   navigation,
-}: StackScreenProps<AuthStackParamList, "Register">) {
+}: NativeStackScreenProps<AuthStackParamList, "ForgotPassword">) {
   const { isDarkmode, setTheme } = useTheme();
   const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function register() {
-    setLoading(true);
-    const { user, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
-    if (!error && !user) {
-      setLoading(false);
-      alert("Check your email for the login link!");
-    }
-    if (error) {
-      setLoading(false);
-      alert(error.message);
-    }
+ //  const emailRef = useRef<HTMLInputElement>(null);
+
+ const resetPassword = async () => {
+
+   try {
+    await auth.sendPasswordResetEmail(
+      email,
+    );
+  } catch (error) {
+    console.error(error);
   }
+
+ }
+
+  // async function forget() {
+  //   setLoading(true);
+  //   const { data, error } = await supabase.auth.api.resetPasswordForEmail(
+  //     email
+  //   );
+  //   if (!error) {
+  //     setLoading(false);
+  //     alert("Check your email to reset your password!");
+  //   }
+  //   if (error) {
+  //     setLoading(false);
+  //     alert(error.message);
+  //   }
+  // }
+ 
   return (
     <KeyboardAvoidingView behavior="height" enabled style={{ flex: 1 }}>
       <Layout>
@@ -50,23 +61,25 @@ export default function ({
             flexGrow: 1,
           }}
         >
-          <View
+          <Section
             style={{
-              flex: 1,
+              flex: 0,
               justifyContent: "center",
               alignItems: "center",
               backgroundColor: isDarkmode ? "#17171E" : themeColor.white100,
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0 
             }}
           >
-            <Image
+            <SectionImage
               resizeMode="contain"
               style={{
                 height: 220,
                 width: 220,
               }}
-              source={require("../../../assets/images/register.png")}
+             source={isDarkmode ? require("../assets/images/philippines-night--.png") : require("../assets/images/philippines.png")}
             />
-          </View>
+          </Section>
           <View
             style={{
               flex: 3,
@@ -76,14 +89,14 @@ export default function ({
             }}
           >
             <Text
-              fontWeight="bold"
               size="h3"
+              fontWeight="bold"
               style={{
                 alignSelf: "center",
                 padding: 30,
               }}
             >
-              Register
+              Forgot Password
             </Text>
             <Text>Email</Text>
             <TextInput
@@ -96,23 +109,9 @@ export default function ({
               keyboardType="email-address"
               onChangeText={(text) => setEmail(text)}
             />
-
-            <Text style={{ marginTop: 15 }}>Password</Text>
-            <TextInput
-              containerStyle={{ marginTop: 15 }}
-              placeholder="Enter your password"
-              value={password}
-              autoCapitalize="none"
-              autoCompleteType="off"
-              autoCorrect={false}
-              secureTextEntry={true}
-              onChangeText={(text) => setPassword(text)}
-            />
             <Button
-              text={loading ? "Loading" : "Create an account"}
-              onPress={() => {
-                register();
-              }}
+              text={loading ? "Loading" : "Send email"}
+              onPress={resetPassword}
               style={{
                 marginTop: 20,
               }}
@@ -123,8 +122,9 @@ export default function ({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 15,
+                marginTop: 25,
                 justifyContent: "center",
+                backgroundColor: "transparent"
               }}
             >
               <Text size="md">Already have an account?</Text>
@@ -138,6 +138,7 @@ export default function ({
                   fontWeight="bold"
                   style={{
                     marginLeft: 5,
+                    color: themeColor.primary
                   }}
                 >
                   Login here
@@ -150,6 +151,7 @@ export default function ({
                 alignItems: "center",
                 marginTop: 30,
                 justifyContent: "center",
+                backgroundColor: "transparent"
               }}
             >
               <TouchableOpacity
@@ -162,9 +164,11 @@ export default function ({
                   fontWeight="bold"
                   style={{
                     marginLeft: 5,
+                    marginTop: 20,
+                    color: themeColor.gray100
                   }}
                 >
-                  {isDarkmode ? "☀️ light theme" : "🌑 dark theme"}
+                  {isDarkmode ? "☀️ set light mode" : "🌑 set dark mode"}
                 </Text>
               </TouchableOpacity>
             </View>

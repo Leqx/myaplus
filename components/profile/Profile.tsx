@@ -1,33 +1,50 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { Avatar, NativeBaseProvider } from 'native-base';
+import React, { useContext } from 'react'
+import { StyleSheet, View, Dimensions } from 'react-native'
+import {  NativeBaseProvider } from 'native-base';
+
+import {
+  Layout,
+  Button,
+  Text,
+  TopNav,
+  Section,
+  SectionContent,
+  useTheme,
+  themeColor,
+  Avatar
+} from "react-native-rapi-ui";
+import { AuthContext } from '../../auth/context/AuthContext';
+
+
+
+const {width,height} = Dimensions.get('window')
 
 export default function ProfileHeader() {
+
+    const user = useContext(AuthContext);
+    
+
     return (
-        <NativeBaseProvider>
-
-
-            <View style={styles.profileHeader}>
+            <Section style={styles.profileHeader}>
                 <View style={styles.avatar}>
                     <Avatar
-                        size="lg"
                         source={{
-                            uri: "https://pbs.twimg.com/profile_images/1320985200663293952/lE_Kg6vr_400x400.jpg",
+                            uri: `${user?.photoURL}`,
                         }}
+                        size="xl"
+                        shape="round"
                     />
                 </View>
                 <View>
-                    <Text style={styles.title}>Eugene</Text>
+                    <Text size="lg">{!user?.displayName ? user?.email: user.displayName }</Text>
 
                 </View>
-            </View>
-        </NativeBaseProvider>
+            </Section>
     )
 }
 
 const styles = StyleSheet.create({
     title: {
-        fontSize: 20,
         fontWeight: 'bold',
     },
     profileHeader: {
@@ -35,11 +52,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: "center",
-        width: "100%",
+        width: width,
         padding: 10,
-        height: "20%"
+        height: 200,      
     },
     avatar: {
-        marginRight: 10,
+        marginRight: 0,
     }
 })

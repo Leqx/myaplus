@@ -4,9 +4,19 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
+
+import {
+  Layout,
+  Button,
+  Text,
+  TopNav,
+  Section,
+  SectionContent,
+  useTheme,
+  themeColor,
+} from "react-native-rapi-ui";
 
 const styles = StyleSheet.create({
   cardMain: {
@@ -21,12 +31,12 @@ const styles = StyleSheet.create({
   card: {
     width: 327,
     borderRadius: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: themeColor.white,
     alignSelf: 'center'
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    backgroundColor: themeColor.black
   },
   btnContainer: ({ pressed }) => ({
     position: 'absolute',
@@ -34,7 +44,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     left: 0,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: themeColor.white,
     height: 44,
     borderRadius: 20,
     justifyContent: 'center',
@@ -55,7 +65,7 @@ export default class Task extends React.Component {
         visible={isModalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View
+        <Section
           style={[
             styles.container,
             {
@@ -67,16 +77,16 @@ export default class Task extends React.Component {
             }
           ]}
         >
-          <View style={styles.cardMain}>
-            <View style={styles.card}>{children}</View>
+          <Section style={styles.cardMain}>
+            <Section style={styles.card}>{children}</Section>
             <Pressable
               style={styles.btnContainer}
               onPress={() => setModalVisible(false)}
             >
               <Text style={styles.textContainer}>Cancel</Text>
             </Pressable>
-          </View>
-        </View>
+          </Section>
+        </Section>
       </Modal>
     );
   }

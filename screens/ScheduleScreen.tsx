@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Dimensions,
@@ -10,17 +10,25 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { Actionsheet, useDisclose, NativeBaseProvider, Modal } from "native-base"
-import { Text, View } from '../components/Themed';
-import {  CalendarList } from 'react-native-calendars';
+// import { Actionsheet, useDisclose, NativeBaseProvider, Modal } from "native-base"
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  Layout,
+  Button,
+  Text,
+  Section,
+  SectionContent,
+  useTheme,
+  themeColor,
+} from "react-native-rapi-ui";
+import {View } from '../components/Themed';
+// import {  CalendarList } from 'react-native-calendars';
 import moment from 'moment';
 import * as Calendar from 'expo-calendar';
 import * as Localization from 'expo-localization';
 import Task from '../components/task/Task';
-
 import CalendarStrip from 'react-native-calendar-strip';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootTabScreenProps } from '../types';
 import useStore from '../store/store';
 
@@ -82,11 +90,12 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
           return true;
         });
 
-        // await AsyncStorage.setItem('TODO', JSON.stringify(updatedList));
+         await AsyncStorage.setItem('TODO', JSON.stringify(updatedList));
         updateCurrentTask(currentDate);
       }
     } catch (error) {
       // Error retrieving data
+      console.error(error)
     }
   };
 
@@ -112,11 +121,11 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
         }
       }
     } catch (error) {
-      console.log('updateCurrentTask', error.message);
+      console.log('updateCurrentTask', error);
     }
   };
 
-    const showDateTimePicker = () => setDateTimePickerVisible(true);
+  const showDateTimePicker = () => setDateTimePickerVisible(true);
 
   const hideDateTimePicker = () => setDateTimePickerVisible(false);
 
@@ -182,7 +191,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
       updateTask.alarm.createEventAsyncRes = '';
       setSelectedTask(updateTask);
     } catch (error) {
-      console.log('deleteAlarm', error.message);
+      console.log('deleteAlarm', error);
     }
   };
 
@@ -208,7 +217,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     try {
       calendarId = await Calendar.createCalendarAsync(newCalendar);
     } catch (e) {
-      Alert.alert(e.message);
+      Alert.alert(e);
     }
 
     return calendarId;
@@ -226,14 +235,10 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     }
   };
 
-
-
-
-
   return (
     <>
-    <NativeBaseProvider>
       {selectedTask !== null && (
+        <Layout>
         <Task {...{ setModalVisible, isModalVisible }}>
           <DateTimePicker
             isVisible={isDateTimePickerVisible}
@@ -243,7 +248,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
             date={new Date()}
             isDarkModeEnabled
           />
-          <View style={styles.taskContainer}>
+          <Section style={styles.taskContainer}>
             <TextInput
               style={styles.title}
               onChangeText={(text) => {
@@ -252,7 +257,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                 setSelectedTask(prevSelectedTask);
               }}
               value={selectedTask.title}
-              placeholder="What do you need to do?"
+              placeholder="What do you need to study?"
             />
             <Text
               style={{
@@ -263,23 +268,23 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
             >
               Suggestion
             </Text>
-            <View style={{ flexDirection: 'row' }}>
+            <Section style={{ flexDirection: 'row' }}>
               <View style={styles.readBook}>
                 <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                  Read book
+                  Math
                 </Text>
               </View>
               <View style={styles.design}>
                 <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                  Design
+                  Physics
                 </Text>
               </View>
               <View style={styles.learn}>
                 <Text style={{ textAlign: 'center', fontSize: 14 }}>Learn</Text>
               </View>
-            </View>
+            </Section>
             <View style={styles.notesContent} />
-            <View>
+            <Section>
               <Text
                 style={{
                   color: '#9CAAC4',
@@ -287,7 +292,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                   fontWeight: '600'
                 }}
               >
-                Notes
+                Business
               </Text>
               <TextInput
                 style={{
@@ -303,11 +308,11 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                   setSelectedTask(prevSelectedTask);
                 }}
                 value={selectedTask.notes}
-                placeholder="Enter notes about the task."
+                placeholder="Enter more info about the task."
               />
-            </View>
+            </Section>
             <View style={styles.separator} />
-            <View>
+            <Section>
               <Text
                 style={{
                   color: '#9CAAC4',
@@ -315,7 +320,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                   fontWeight: '600'
                 }}
               >
-                Times
+                Set Times
               </Text>
               <TouchableOpacity
                 onPress={() => showDateTimePicker()}
@@ -330,16 +335,16 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                   )}
                 </Text>
               </TouchableOpacity>
-            </View>
+            </Section>
             <View style={styles.separator} />
-            <View
+            <Section
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center'
               }}
             >
-              <View>
+              <Section>
                 <Text
                   style={{
                     color: '#9CAAC4',
@@ -347,9 +352,9 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                     fontWeight: '600'
                   }}
                 >
-                  Alarm
+                  Set Alarm
                 </Text>
-                <View
+                <Section
                   style={{
                     height: 25,
                     marginTop: 3
@@ -360,18 +365,18 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                       'h:mm A'
                     )}
                   </Text>
-                </View>
-              </View>
+                </Section>
+              </Section>
               <Switch
                 value={selectedTask?.alarm?.isOn || false}
                 onValueChange={handleAlarmSet}
               />
-            </View>
-            <View
+            </Section>
+            <Section
               style={{
                 flexDirection: 'row',
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
               }}
             >
               <TouchableOpacity
@@ -423,11 +428,12 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                   DELETE
                 </Text>
               </TouchableOpacity>
-            </View>
-          </View>
+            </Section>
+          </Section>
         </Task>
+        </Layout>
       )}
-      <SafeAreaView style={styles.container}>
+      <Layout>
          <CalendarStrip
           calendarAnimation={{ type: 'sequence', duration: 30 }}
           daySelectionAnimation={{
@@ -435,16 +441,16 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
             duration: 200
           }}
           style={{
-            height: 150,
+            height: 180,
             paddingTop: 20,
-            paddingBottom: 20
+            paddingBottom: 20,
           }}
-          calendarHeaderStyle={{ color: '#000000' }}
-          dateNumberStyle={{ color: '#000000', paddingTop: 10 }}
-          dateNameStyle={{ color: '#BBBBBB' }}
+          calendarHeaderStyle={{ color: themeColor.primary }}
+          dateNumberStyle={{ color: themeColor.gray200, paddingTop: 10 }}
+          dateNameStyle={{ color: themeColor.gray100 }}
           highlightDateNumberStyle={{
-            color: '#fff',
-            backgroundColor: '#2E66E7',
+            color: themeColor.white,
+            backgroundColor: themeColor.primary,
             marginTop: 10,
             height: 35,
             width: 35,
@@ -456,9 +462,9 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
             justifyContent: 'center',
             alignItems: 'center'
           }}
-          highlightDateNameStyle={{ color: '#2E66E7' }}
-          disabledDateNameStyle={{ color: 'grey' }}
-          disabledDateNumberStyle={{ color: 'grey', paddingTop: 10 }}
+          highlightDateNameStyle={{ color: themeColor.primary }}
+          disabledDateNameStyle={{ color: themeColor.gray100 }}
+          disabledDateNumberStyle={{ color: themeColor.gray100, paddingTop: 10 }}
           datesWhitelist={datesWhitelist}
           iconLeft={require('../assets/images/left-arrow.png')}
           iconRight={require('../assets/images/right-arrow.png')}
@@ -494,7 +500,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
             }}
           />
         </TouchableOpacity>
-                <View
+           <Section
           style={{
             width: '100%',
             height: Dimensions.get('window').height - 170
@@ -515,15 +521,17 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                 key={item.key}
                 style={styles.taskListContent}
               >
-                <View
+                <SectionContent
                   style={{
-                    marginLeft: 13
+                    marginLeft: 13,
+                    backgroundColor: 'transparent'
                   }}
                 >
                   <View
                     style={{
                       flexDirection: 'row',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      backgroundColor: 'transparent'
                     }}
                   >
                     <View
@@ -536,10 +544,11 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                       }}
                     />
                     <Text
+                    size='lg'
                       style={{
                         color: '#554A4C',
-                        fontSize: 20,
-                        fontWeight: '700'
+                        fontWeight: '700',
+                       
                       }}
                     >
                       {item.title}
@@ -549,14 +558,17 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                     <View
                       style={{
                         flexDirection: 'row',
-                        marginLeft: 20
+                        marginLeft: 0,
+                        backgroundColor: themeColor.primary300,
+                        
                       }}
                     >
                       <Text
                         style={{
-                          color: '#BBBBBB',
+                          color: themeColor.black,
                           fontSize: 14,
-                          marginRight: 5
+                          marginRight: 5,
+                          
                         }}
                       >{`${moment(item.alarm.time).format('YYYY')}/${moment(
                         item.alarm.time
@@ -565,15 +577,15 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                       )}`}</Text>
                       <Text
                         style={{
-                          color: '#BBBBBB',
-                          fontSize: 14
+                          fontSize: 14,
+                          color: themeColor.black,
                         }}
                       >
                         {item.notes}
                       </Text>
                     </View>
                   </View>
-                </View>
+                </SectionContent>
                 <View
                   style={{
                     height: 80,
@@ -585,9 +597,8 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-        </View>
-      </SafeAreaView>
-    </NativeBaseProvider>
+        </Section>
+      </Layout>
     </>
   );
 }
@@ -598,10 +609,10 @@ export default ScheduleScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 10
+    paddingTop: 0
   },
   item: {
-    backgroundColor: 'white',
+    backgroundColor: themeColor.white,
     flex: 1,
     borderRadius: 5,
     padding: 10,
@@ -628,7 +639,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 10,
     shadowColor: '#2E66E7',
-    backgroundColor: '#ffffff',
+    backgroundColor: themeColor.primary300,
     marginTop: 10,
     marginBottom: 10,
     shadowOffset: {
@@ -723,7 +734,8 @@ const styles = StyleSheet.create({
     borderColor: '#5DD976',
     borderLeftWidth: 1,
     paddingLeft: 8,
-    fontSize: 19
+    fontSize: 19,
+    color: '#5DD976'
   },
   taskContainer: {
     height: 475,
@@ -731,7 +743,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 20,
     shadowColor: '#2E66E7',
-    backgroundColor: '#ffffff',
+    backgroundColor: themeColor.white,
     shadowOffset: {
       width: 3,
       height: 3
@@ -752,6 +764,10 @@ function updateCurrentTask(selectedDate: string) {
 }
 
 function createNewCalendar() {
+  throw new Error('Function not implemented.');
+}
+
+function updatedList(updatedList: any): string {
   throw new Error('Function not implemented.');
 }
 

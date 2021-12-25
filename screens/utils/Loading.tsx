@@ -1,6 +1,8 @@
 import React from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator,Image, Dimensions} from "react-native";
 import { Layout, themeColor } from "react-native-rapi-ui";
+
+const { width ,height} = Dimensions.get('screen');
 
 export default function () {
   return (

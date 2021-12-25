@@ -1,21 +1,22 @@
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
-import { View } from '../components/Themed';
-
+import { StyleSheet,Dimensions } from 'react-native';
 import Settings from '../components/settings/Settings';
 import ProfileHeader from '../components/profile/Profile';
+import { Layout, Section } from "react-native-rapi-ui";
+
+const {width,height} = Dimensions.get('window')
 
 export default function SettingsScreen() {
   return (
-    <View style={styles.container}>
-      <View style={styles.profile}>
+    <Layout style={styles.container}>
+      <Section style={styles.profile}>
 
         <ProfileHeader />
-      </View>
-      <View style={styles.settings}>
+      </Section>
+      <Section style={styles.settings}>
         <Settings />
-      </View>
-    </View>
+      </Section>
+    </Layout>
   );
 }
 
@@ -24,23 +25,28 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 20
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    width: width,
+    height: height,
+    borderBottomRightRadius: 0,
+    borderBottomLeftRadius: 0,
   },
   profile: {
     flex: 1,
     flexDirection: 'row',
+    borderBottomRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderTopLeftRadius: 0
+
 
   },
   settings: {
-    flex: 4
+    flex: 4,
+    borderBottomRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderTopLeftRadius: 0
   },
-  avatar: {
-    marginHorizontal: 10,
-  },
-
 });

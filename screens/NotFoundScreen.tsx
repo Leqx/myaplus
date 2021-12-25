@@ -1,13 +1,38 @@
 import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View ,Image} from 'react-native';
+import {
+  Layout,
+  Text,
+  TextInput,
+  Button,
+  useTheme,
+  themeColor,
+} from "react-native-rapi-ui";
 
-import { RootStackScreenProps } from '../types';
+import { RootStackScreenProps ,AuthStackScreenProps} from '../types';
 
-export default function NotFoundScreen({ navigation }: RootStackScreenProps<'NotFound'>) {
+export default function NotFoundScreen({ navigation }: AuthStackScreenProps<'Login'>) {
+  const { isDarkmode, setTheme } = useTheme();
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>This screen doesn't exist.</Text>
-      <TouchableOpacity onPress={() => navigation.replace('Root')} style={styles.link}>
+       <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: isDarkmode ? "#17171E" : themeColor.white100,
+            }}
+          >
+            <Image
+              resizeMode="contain"
+              style={{
+                height: 220,
+                width: 220,
+              }}
+             source={isDarkmode ? require("../assets/images/philippines-night--.png") : require("../assets/images/philippines.png")}
+            />
+          </View>
+      <TouchableOpacity onPress={() => navigation.replace('Login')} style={styles.link}>
         <Text style={styles.linkText}>Go to home screen!</Text>
       </TouchableOpacity>
     </View>

@@ -1,74 +1,48 @@
 import React from "react"
-import { VStack, Center, Heading, NativeBaseProvider, Text } from "native-base"
+import { VStack, Center, Heading, NativeBaseProvider} from "native-base"
+import {
+  Layout,
+  Button,
+  Text,
+  TopNav,
+  Section,
+  SectionContent,
+  useTheme,
+  themeColor,
+} from "react-native-rapi-ui";
 export function ServicesScreen() {
+
+  const { isDarkmode, setTheme } = useTheme();
+
   return (
-    <VStack space={4} alignItems="center">
-      <Heading textAlign="center" mb="2">
-        Our Services
-      </Heading>
-      <Center w="64" h="300" bg="white" rounded="md" shadow={3} >
-        <VStack>
-          <Text
-            marginTop="5"
-            fontSize="lg"
-            paddingLeft="2"
-            paddingRight="2"
-            italic
-            highlight
-            _dark={{
-              color: "coolgray.800",
-            }
+      <Layout>
 
-            }
-          >Access to Course Units</Text>
+        <Section>
+          <Text size='h3'> Our Services </Text>
 
-          <Text
-            marginTop="5"
-            paddingLeft="2"
-            paddingRight="2"
-            fontSize="lg"
-            italic
-            highlight
-            _dark={{
-              color: "coolgray.800",
-            }}
-          >Schedule Study Time</Text>
+        </Section>
 
-          <Text
-            marginTop="5"
-            paddingLeft="2"
-            paddingRight="2"
-            fontSize="lg"
-            italic
-            highlight
-            _dark={{
-              color: "coolgray.800",
-            }}
-          >Track Study Time</Text>
+        <Section>
 
-          <Text
-            marginTop="5"
-            paddingLeft="2"
-            paddingRight="2"
-            fontSize="lg"
-            italic
-            highlight
-            _dark={{
-              color: "coolgray.800",
-            }}
-          >Study Reminders</Text>
-        </VStack>
-      </Center>
-    </VStack>
+          <Text size="md">Access to Course Units</Text>
+
+          <Text size="md">Schedule Study Time</Text>
+
+          <Text size="md" >Track Study Time</Text>
+
+          <Text size="md" >Study Reminders</Text>
+          
+        </Section>
+
+        </Layout>
+
   )
 }
 
 export default () => {
   return (
-    <NativeBaseProvider>
-      <Center marginTop="10" px="3">
-        <ServicesScreen />
-      </Center>
-    </NativeBaseProvider>
+    <>
+    <ServicesScreen />
+    </>
   )
 }
