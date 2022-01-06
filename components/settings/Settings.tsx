@@ -1,8 +1,7 @@
 import React, { useContext } from 'react'
 import { StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons,MaterialCommunityIcons} from '@expo/vector-icons';
 import { View } from '../../components/Themed';
-// import { supabase } from "../../initSupabase";
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -19,6 +18,7 @@ import {
   themeColor,
 } from "react-native-rapi-ui";
 import { auth } from '../../initFirebase';
+import {signOut} from "firebase/auth"
 
 
 
@@ -28,22 +28,14 @@ export default function Settings() {
 
     const { isDarkmode, setTheme } = useTheme();
 
-    const signOut = async () => {
+    const logOut =  () => {
 
-  await auth.signOut();
+  signOut(auth).then(()=>{
+    alert("Signed out!");
+
+  }).catch(err => console.error(err))
 
   };
-
-                // async () => {
-                // const { error } = await supabase.auth.signOut();
-                // if (!error) {
-                //   alert("Signed out!");
-                // }
-                // if (error) {
-                //   alert(error.message);
-                // }
-                
-                // }
 
     return (
         <Section style={styles.container}>
@@ -57,8 +49,18 @@ export default function Settings() {
                     style={styles.wrapper}
                     onPress={() => navigation.navigate('Services')}
                 >
-                    <Text size='md' >Services</Text>
+                    <Text size='md' >Upgrade to Premium</Text>
                     <FontAwesome name="handshake-o" size={18} color={isDarkmode ? themeColor.white : themeColor.black}  />
+                </TouchableOpacity>
+                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+
+
+                <TouchableOpacity
+                    style={styles.wrapper}
+                    onPress={() => navigation.navigate('Services')}
+                >
+                    <Text size='md' >Remove ads</Text>
+                    <MaterialCommunityIcons name="shield-remove-outline" size={18} color={isDarkmode ? themeColor.white : themeColor.black}  />
                 </TouchableOpacity>
                 <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
 
@@ -79,11 +81,12 @@ export default function Settings() {
                 <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
 
                 <TouchableOpacity style={styles.wrapper}
-                onPress={signOut}
+                onPress={logOut}
                 >
                     <Text size='md'>Sign Out</Text>
+                    <Ionicons name="log-out-outline" size={18} color={isDarkmode ? themeColor.white : themeColor.black} />
                 </TouchableOpacity>
-                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+
             </Section>
         </Section>
     )
@@ -94,7 +97,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "column",
         width: width,
-        height: 150,
+        height: 250,
     },
     titleWrapper: {
         height: 30,
@@ -120,7 +123,7 @@ const styles = StyleSheet.create({
         width: width,
     },
     settingsContainer: {
-        height: 200,
+        height: 250,
         paddingTop: 0
     }
 })

@@ -7,7 +7,9 @@ import {
   Animated,
   StyleSheet,
   SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
+import { useContext } from 'react';
 import {  View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -31,7 +33,8 @@ import UnitsContext from '../context/units/units-context';
 import scheduleReducer from '../context/schedule/schedule-reducer';
 import unitsReducer from '../context/units/units-reducer';
 import { AuthContext } from '../auth/context/AuthContext';
-import { useContext } from 'react';
+import SearchFilter from '../components/search/SearchFilter';
+import Ads from '../components/ads/Ads';
 
 import {unitsRef} from '../initFirebase'
 import {getDocs} from "firebase/firestore"
@@ -103,9 +106,6 @@ React.useEffect(() => {
   }
 }, [])
 
-
-// console.log(unitsData)
-
   return (
     
     <Layout>
@@ -114,11 +114,15 @@ React.useEffect(() => {
           <Section  style={styles.headerImage} >
     <SectionImage  height={150}  resizeMode='contain' source={isDarkmode ? require("../assets/images/Tropical-night-.png") : require("../assets/images/Tropical.png")} />
     <SectionContent style={styles.headerText} >
-       <Text size='xl'> {`Hey ${!user?.displayName ? "there" : user.displayName}, `}</Text>
-            <Text size='xl'> What would you like to learn today?</Text>
+       <Text size='lg'> {`Hey ${!user?.displayName ? "there" : user.displayName}, `}</Text>
+            <Text size='lg'> What would you like to learn today?</Text>
     </SectionContent>
 </Section>
           <SearchBar/>
+      </Section>
+
+      <Section style={styles.filterContainer}>
+        <SearchFilter/>
       </Section>
 
       <Section style={styles.units}>
@@ -136,18 +140,44 @@ React.useEffect(() => {
         renderItem={({ item }) => (
           
           <SectionContent style={styles.slider}>
-              
             <Section  style={styles.titleContainer} >
             <Text style={styles.title} size='h3'>{item.title} </Text>
             </Section>
 
             <Section style={styles.countContainer}>
-            <Text style={styles.count} size='h3'>{item.numberOfChapters} Chapters </Text>
+            <Text style={styles.count} size='sm'>{item.numberOfChapters} Chapters </Text>
             </Section>
+
+            <View style={styles.favButtonContainer}>
+
+              <TouchableOpacity>
+                <Ionicons
+                name='heart-outline'
+                size={20}
+                color='white'
+                />
+              </TouchableOpacity>
+
+              <Button 
+              text='Study'
+              size="md"  
+              rightContent={
+                <Ionicons
+                  name="arrow-forward"
+                  size={20}
+                  color='white'
+                />
+              }
+              />
+             
+            </View>
           </SectionContent>
         )}
         keyExtractor={item => item.id}
         />
+      </Section>
+      <Section  style={styles.adsContainer}>
+       <Ads/>
       </Section>
     </Layout>
   );
@@ -161,14 +191,14 @@ const styles = StyleSheet.create({
     
   },
   title: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: -1,
     paddingHorizontal:  10
   },
   count: {
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: 'normal',
     paddingLeft: 12 ,
     paddingTop: 10,
@@ -189,11 +219,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 0
   },
   units:{
-    flex: 1.5,
+    flex: 1.8,
     borderBottomRightRadius: 0,
     borderBottomLeftRadius: 0,
     borderTopRightRadius: 0,
-    borderTopLeftRadius: 0
+    borderTopLeftRadius: 0,
+    
   },
    itemContainer: {
         width: 50,
@@ -206,8 +237,9 @@ const styles = StyleSheet.create({
     },
     slider:{
       paddingHorizontal: 10,
+      paddingVertical: 2,
       borderRadius: 20,
-      marginHorizontal: 5,
+      marginHorizontal: 10,
       width: 200,
       height: 300,
       flex: 0.5,
@@ -243,6 +275,7 @@ const styles = StyleSheet.create({
   },
   headerText:{
     position: 'absolute',
+    paddingTop: 50
 
   },
   headerImage: {
@@ -250,5 +283,41 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 0,
     borderTopRightRadius: 0,
     borderTopLeftRadius: 0
-  }
+  },
+  filterContainer:{
+   borderTopRightRadius: 0,
+   borderBottomRightRadius: 0,
+   borderTopLeftRadius: 0,
+   borderBottomLeftRadius: 0,
+   flex: 0.2,
+   justifyContent: 'center',
+   alignItems: 'center',
+   flexDirection: 'column'
+  },
+  favButtonContainer:{
+   borderTopRightRadius: 0,
+   borderBottomRightRadius: 0,
+   borderTopLeftRadius: 0,
+   borderBottomLeftRadius: 0,
+   flex: 0.2,
+   justifyContent: 'space-between',
+   alignItems: 'center',
+   flexDirection: 'row',
+   backgroundColor: themeColor.primary,
+   paddingLeft: 10,
+   paddingTop: 15
+   
+  },
+  adsContainer:{
+   borderTopRightRadius: 0,
+   borderBottomRightRadius: 0,
+   borderTopLeftRadius: 0,
+   borderBottomLeftRadius: 0,
+   flex: 0.1,
+   justifyContent: 'center',
+   alignItems: 'center',
+   flexDirection: 'column',
+   paddingVertical: 20
+  },
+  
 });
