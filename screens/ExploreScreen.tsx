@@ -11,7 +11,6 @@ import {
 import {  View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import { LinearGradient } from 'expo-linear-gradient';
-import { supabase } from "../initSupabase";
 import {
   Layout,
   Button,
@@ -25,8 +24,6 @@ import {
 } from "react-native-rapi-ui";
 import { Ionicons } from "@expo/vector-icons";
 
-
-
 import SearchBar from '../components/search/SearchBar';
 import UnitsSlider from '../components/unitsSlider/UnitsSlider';
 import ScheduleContext from '../context/schedule/schedule-context';
@@ -36,6 +33,10 @@ import unitsReducer from '../context/units/units-reducer';
 import { AuthContext } from '../auth/context/AuthContext';
 import { useContext } from 'react';
 
+import {unitsRef} from '../initFirebase'
+import {getDocs} from "firebase/firestore"
+
+
 const { width } = Dimensions.get('screen');
 
 const OVERFLOW_HEIGHT = 70;
@@ -43,6 +44,7 @@ const SPACING = 10;
 const ITEM_WIDTH = width * 0.66;
 const ITEM_HEIGHT = ITEM_WIDTH * 1.7;
 const VISIBLE_ITEMS = 3;
+
 
 
 export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explore'>) {
@@ -76,6 +78,33 @@ export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explor
     },
 ])
 
+const [unitsData, setUnitsData] = React.useState<Array<{id: string; title: string; description: string; numberOfChapters: number;}>>([])
+
+React.useEffect(() => {
+
+   getDocs(unitsRef).then((snapshot)=>{
+      let units: { id: string; title: string; description: string; numberOfChapters: number; }[] = []
+      snapshot.docs.forEach((doc)=> {
+
+        let id = doc.id
+        let title = doc.data().title
+        let description = doc.data().description
+        let numberOfChapters = doc.data().numberOfChapters
+
+          units.push({...doc.data(),id: id, title: title, description: description,numberOfChapters: numberOfChapters })
+          setUnitsData(units)
+      })
+      
+   }).catch((err)=> console.error(err))
+
+  
+  return () => {
+    console.log('clean up')
+  }
+}, [])
+
+
+// console.log(unitsData)
 
   return (
     
@@ -94,7 +123,7 @@ export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explor
 
       <Section style={styles.units}>
         <FlatList
-        data={sliderData}
+        data={unitsData}
         horizontal
         scrollEnabled={true}
         showsHorizontalScrollIndicator={false} 
@@ -113,11 +142,11 @@ export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explor
             </Section>
 
             <Section style={styles.countContainer}>
-            <Text style={styles.count} size='h3'>{item.chapterCount} Chapters </Text>
+            <Text style={styles.count} size='h3'>{item.numberOfChapters} Chapters </Text>
             </Section>
           </SectionContent>
         )}
-        keyExtractor={item => item.title}
+        keyExtractor={item => item.id}
         />
       </Section>
     </Layout>

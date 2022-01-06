@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet,ScrollView, TouchableOpacity,Image,KeyboardAvoidingView, Dimensions } from 'react-native';
 import {  View } from '../components/Themed';
-import { supabase } from "../initSupabase";
 import { AuthStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -17,6 +16,7 @@ import {
   SectionImage
 } from "react-native-rapi-ui";
 import { auth } from "../initFirebase";
+import {signInWithEmailAndPassword} from "firebase/auth"
 
 
 const { width } = Dimensions.get('screen');
@@ -31,19 +31,13 @@ export default function ({
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  // const emailRef = useRef<HTMLInputElement>(null);
-  // const passwordRef = useRef<HTMLInputElement>(null);
+  const signIn = () => {
+    signInWithEmailAndPassword(auth,email,password).then((cred)=>{
 
-  const signIn = async () => {
-  try {
-    await auth.signInWithEmailAndPassword(
-      email,
-      password
-    );
-  } catch (error) {
-    console.error(error);
+      console.log(cred.user)
+
+    }).catch(err => console.error(err))
   }
-};
  
   // async function login() {
   //   setLoading(true);

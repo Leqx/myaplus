@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import { ScrollView, TouchableOpacity,Image,KeyboardAvoidingView } from 'react-native';
 import { View } from '../components/Themed';
-import { supabase } from "../initSupabase";
 import { AuthStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
@@ -15,6 +14,7 @@ import {
   SectionImage
 } from "react-native-rapi-ui";
 import { auth } from "../initFirebase";
+import {createUserWithEmailAndPassword} from "firebase/auth"
 
 
 export default function ({
@@ -25,42 +25,19 @@ export default function ({
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  // const emailRef = useRef<HTMLInputElement>(null);
-  // const passwordRef = useRef<HTMLInputElement>(null);
+  const createAccount = ()=> {
 
-  const createAccount = async () => {
-  try {
-    await auth.createUserWithEmailAndPassword(
-      email,
-      password
-    );
-  } catch (error) {
-    console.error(error);
+    createUserWithEmailAndPassword(auth,email,password).then((cred)=> {
+
+      console.log(cred.user)
+       alert("Check your email for the login link!");
+
+    }).catch(err => console.error(err))
+
   }
-};
+
  
-  //  async function register() {
 
-  //    console.log(`Register ${email} ${password}`)
-  //   setLoading(true);
-  //   const { user, error } = await supabase.auth.signUp({
-  //     email,
-  //     password
-  //   });
-
-  //   if (!error && !user) {
-  //     setLoading(false);
-  //     alert("Check your email for the login link!");
-  //   }
-  //   if (error) {
-  //     setLoading(false);
-  //     alert(`${error.message}`);
-  //   }
-  // }
-
-  function log(){
-    console.log("called")
-  }
 
   return (
     <KeyboardAvoidingView behavior="height" enabled style={{ flex: 1 }}>

@@ -36,10 +36,9 @@ import {
   themeColor,
 } from "react-native-rapi-ui";
 
-// import { AuthContext } from '../provider/AuthProvider';
 import { AuthContext } from '../auth/context/AuthContext';
 import { auth } from "../initFirebase";
-
+import {onAuthStateChanged} from "firebase/auth"
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -48,18 +47,18 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
   // const { user} = useContext(AuthContext);
   // {user == null && <Loading />}
 
-  
-
-   const user = useContext(AuthContext);
-
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const user = useContext(AuthContext);
   const { isDarkmode, setTheme } = useTheme();
 
+
   useEffect(() => {
-     auth.onAuthStateChanged((user) => {
-      if (user) {
-        console.log('user is logged');
-      }
-});
+
+    onAuthStateChanged(auth,(user)=> {
+      console.log('user status changed:',user)
+      setLoading(false)
+    })
+     
     return () => {
       console.log('unsub')
     }
@@ -71,9 +70,9 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-       {!user && <AuthStackNavigator />}
-			 {user && <RootNavigator  />}
-      
+       {loading && <Loading />}
+       {!user && !loading && <AuthStackNavigator />}
+			 {user && !loading && <RootNavigator  />}
     </NavigationContainer>
   );
 }

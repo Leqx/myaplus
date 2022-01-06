@@ -1,7 +1,10 @@
 // import * as firebase from  "firebase"
 
-import firebase from "firebase/app";
-import "firebase/auth";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+import { getAuth } from "firebase/auth";
+import { getFirestore,collection} from "firebase/firestore";
 // import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -21,12 +24,12 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_MEASUREMENTID
 };
 
-firebase.initializeApp(firebaseConfig);
+const firebaseApp = firebase.initializeApp(firebaseConfig);
 
-export const auth = firebase.auth();
+export const auth = getAuth(firebaseApp);
 
+export const db = getFirestore(firebaseApp)
 
-// Initialize Firebase
-// const app = firebase.initializeApp(firebaseConfig);
-// const analytics = firebase.getAnalytics(app);
+export const unitsRef = collection(db,'units')
+
 

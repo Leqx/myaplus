@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet,ScrollView, TouchableOpacity,Image,KeyboardAvoidingView } from 'react-native';
 import { View } from '../components/Themed';
-import { supabase } from "../initSupabase";
 import { AuthStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
@@ -16,6 +15,7 @@ import {
   SectionImage
 } from "react-native-rapi-ui";
 import { auth } from "../initFirebase";
+import {sendPasswordResetEmail} from "firebase/auth"
 
 export default function ({
   navigation,
@@ -24,17 +24,14 @@ export default function ({
   const [email, setEmail] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
- //  const emailRef = useRef<HTMLInputElement>(null);
+ const resetPassword = () => {
 
- const resetPassword = async () => {
+   sendPasswordResetEmail(auth,email).then((cred)=> {
 
-   try {
-    await auth.sendPasswordResetEmail(
-      email,
-    );
-  } catch (error) {
-    console.error(error);
-  }
+    console.log(cred)
+    alert("Check your email to reset your password!");
+
+   }).catch(err => console.error(err))
 
  }
 
