@@ -19,12 +19,18 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config":{
+        "googleMobileAdsAppId": "ca-app-pub-8894615898933019~7597768930"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "config":{
+        "googleMobileAdsAppId": "ca-app-pub-8894615898933019~5039694830"
       }
     },
     "web": {

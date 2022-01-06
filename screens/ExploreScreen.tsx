@@ -8,7 +8,11 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  Modal,
+  ToastAndroid,
+  Platform
 } from 'react-native';
+import {AdMobBanner,setTestDeviceIDAsync} from 'expo-ads-admob'
 import { useContext } from 'react';
 import {  View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
@@ -48,8 +52,6 @@ const ITEM_WIDTH = width * 0.66;
 const ITEM_HEIGHT = ITEM_WIDTH * 1.7;
 const VISIBLE_ITEMS = 3;
 
-
-
 export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explore'>) {
 
   const schedule = React.useContext(ScheduleContext)
@@ -60,28 +62,38 @@ export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explor
 
    const user = useContext(AuthContext);
 
-
-
-  const [sliderData, setSliderData] = React.useState([
-    {
-        title: "Accounting",
-        chapterCount: "10",
-    },
-    {
-        title: "Management",
-        chapterCount: "7",
-    },
-    {
-        title: "Math",
-        chapterCount: "12",
-    },
-    {
-        title: "Microeconomics",
-        chapterCount: "9",
-    },
-])
+//   const [productData, setProductData] = React.useState([
+//     {
+//         name: "pencil",
+//         desc: "this is a desc",
+//         price: "20"
+//     },
+//     {
+//         name: "book",
+//         desc: "this is a desc",
+//         price: "30"
+//     },
+//     {
+//         name: "pen",
+//         desc: "this is a desc",
+//         price: "25"
+//     },
+//     {
+//         name: "set",
+//         desc: "this is a desc",
+//         price: "100"
+//     },
+// ])
 
 const [unitsData, setUnitsData] = React.useState<Array<{id: string; title: string; description: string; numberOfChapters: number;}>>([])
+const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+
+const showToast = ()=>{
+   ToastAndroid.show('Successfully added to my list', ToastAndroid.SHORT);
+}
+
+const [bannerAdId,setBannerAdId] = React.useState<string>(Platform.OS === 'ios' ? "ca-app-pub-3940256099942544/2934735716": "ca-app-pub-3940256099942544/6300978111")
+
 
 React.useEffect(() => {
 
@@ -100,7 +112,8 @@ React.useEffect(() => {
       
    }).catch((err)=> console.error(err))
 
-  
+   // setTestDeviceIDAsync("EMULATOR");
+
   return () => {
     console.log('clean up')
   }
@@ -109,6 +122,19 @@ React.useEffect(() => {
   return (
     
     <Layout>
+
+      <Modal visible={modalOpen} >
+        <LinearGradient colors={['#3366FF', '#262834','#262834']} style={styles.modal} >
+          
+          <Ionicons
+            name="close"
+            size={28}
+            color={themeColor.danger}
+            style={styles.close}
+            onPress={()=> setModalOpen(false)}
+           />
+        </LinearGradient>
+      </Modal>
 
       <Section style={styles.header}>
           <Section  style={styles.headerImage} >
@@ -122,7 +148,11 @@ React.useEffect(() => {
       </Section>
 
       <Section style={styles.filterContainer}>
-        <SearchFilter/>
+        <TouchableOpacity 
+        onPress={()=> setModalOpen(true)}
+        >
+        <SearchFilter />
+        </TouchableOpacity>
       </Section>
 
       <Section style={styles.units}>
@@ -155,6 +185,7 @@ React.useEffect(() => {
                 name='heart-outline'
                 size={20}
                 color='white'
+                onLongPress={showToast}
                 />
               </TouchableOpacity>
 
@@ -177,7 +208,11 @@ React.useEffect(() => {
         />
       </Section>
       <Section  style={styles.adsContainer}>
-       <Ads/>
+       <AdMobBanner
+       bannerSize='banner'
+       adUnitID={bannerAdId} 
+       servePersonalizedAds={true} 
+       onDidFailToReceiveAdWithError={(err)=> console.error(err)} />
       </Section>
     </Layout>
   );
@@ -319,5 +354,12 @@ const styles = StyleSheet.create({
    flexDirection: 'column',
    paddingVertical: 20
   },
+  modal:{
+    flex: 1,
+    alignItems: 'center'
+  },
+  close:{
+    marginTop: 50
+  }
   
 });

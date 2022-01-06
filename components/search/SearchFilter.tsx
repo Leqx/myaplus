@@ -21,8 +21,9 @@ const {width,height} = Dimensions.get('window')
 
 export default function SearchFilter() {
 
-    const user = useContext(AuthContext);
+    const user = React.useContext(AuthContext);
     
+    const [modalOpen, setModalOpen] = React.useState<boolean>(false);
 
     return (
             <Section style={styles.profileHeader}>
