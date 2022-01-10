@@ -1,48 +1,47 @@
 import * as React from 'react';
+
+import {AdMobBanner, setTestDeviceIDAsync} from 'expo-ads-admob'
 import {
-  StatusBar,
-  Image,
-  FlatList,
-  Dimensions,
   Animated,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
+  Dimensions,
+  FlatList,
+  Image,
   Modal,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
   ToastAndroid,
-  Platform
+  TouchableOpacity
 } from 'react-native';
-import {AdMobBanner,setTestDeviceIDAsync} from 'expo-ads-admob'
-import { useContext } from 'react';
-import {  View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
-import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Layout,
   Button,
-  Text,
-  TopNav,
+  Layout,
   Section,
   SectionContent,
-  useTheme,
+  SectionImage,
+  Text,
+  TopNav,
   themeColor,
-  SectionImage
+  useTheme
 } from "react-native-rapi-ui";
-import { Ionicons } from "@expo/vector-icons";
 
-import SearchBar from '../components/search/SearchBar';
-import UnitsSlider from '../components/unitsSlider/UnitsSlider';
+import Ads from '../components/ads/Ads';
+import { AuthContext } from '../auth/context/AuthContext';
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from 'expo-linear-gradient';
+import { RootTabScreenProps } from '../types';
 import ScheduleContext from '../context/schedule/schedule-context';
+import SearchBar from '../components/search/SearchBar';
+import SearchFilter from '../components/search/SearchFilter';
 import UnitsContext from '../context/units/units-context';
+import UnitsSlider from '../components/unitsSlider/UnitsSlider';
+import { View } from '../components/Themed';
+import {getDocs} from "firebase/firestore"
 import scheduleReducer from '../context/schedule/schedule-reducer';
 import unitsReducer from '../context/units/units-reducer';
-import { AuthContext } from '../auth/context/AuthContext';
-import SearchFilter from '../components/search/SearchFilter';
-import Ads from '../components/ads/Ads';
-
 import {unitsRef} from '../initFirebase'
-import {getDocs} from "firebase/firestore"
-
+import { useContext } from 'react';
 
 const { width } = Dimensions.get('screen');
 
@@ -60,30 +59,8 @@ export default function ExploreScreen({ navigation }: RootTabScreenProps<'Explor
 
   const { isDarkmode, setTheme } = useTheme();
 
-   const user = useContext(AuthContext);
+  const user = useContext(AuthContext);
 
-//   const [productData, setProductData] = React.useState([
-//     {
-//         name: "pencil",
-//         desc: "this is a desc",
-//         price: "20"
-//     },
-//     {
-//         name: "book",
-//         desc: "this is a desc",
-//         price: "30"
-//     },
-//     {
-//         name: "pen",
-//         desc: "this is a desc",
-//         price: "25"
-//     },
-//     {
-//         name: "set",
-//         desc: "this is a desc",
-//         price: "100"
-//     },
-// ])
 
 const [unitsData, setUnitsData] = React.useState<Array<{id: string; title: string; description: string; numberOfChapters: number;}>>([])
 const [modalOpen, setModalOpen] = React.useState<boolean>(false);
@@ -196,7 +173,7 @@ React.useEffect(() => {
                 <Ionicons
                   name="arrow-forward"
                   size={20}
-                  color='white'
+                  color='#262834'
                 />
               }
               />
@@ -209,7 +186,7 @@ React.useEffect(() => {
       </Section>
       <Section  style={styles.adsContainer}>
        <AdMobBanner
-       bannerSize='banner'
+       bannerSize='smartBannerLandscape'
        adUnitID={bannerAdId} 
        servePersonalizedAds={true} 
        onDidFailToReceiveAdWithError={(err)=> console.error(err)} />
@@ -217,6 +194,8 @@ React.useEffect(() => {
     </Layout>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

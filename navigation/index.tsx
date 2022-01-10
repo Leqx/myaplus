@@ -4,7 +4,7 @@
  *
  */
 import React, { useContext, useEffect} from 'react';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome,Fontisto,FontAwesome5,MaterialIcons, MaterialCommunityIcons  } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -25,6 +25,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import LoginScreen from '../screens/LoginScreen';
 import Loading from '../screens/utils/Loading';
+import StoreScreen from '../screens/StoreScreen'
 import {
   Layout,
   Button,
@@ -180,6 +181,16 @@ function BottomTabNavigator() {
           tabBarIcon: ({ color }) => <Ionicons name="ios-time-outline" size={24} color={color} />,
         }}
       />
+        <BottomTab.Screen
+        name="Store"
+        component={StoreScreen}
+        options={{
+          title: 'Store',
+          headerShown: false,
+          tabBarLabelStyle: {color: themeColor.gray500},
+          tabBarIcon: ({ color }) => <Fontisto name="shopping-bag-1" size={24} color={color} />,
+        }}
+      />
       <BottomTab.Screen
         name="Settings"
         component={SettingsScreen}
@@ -190,6 +201,7 @@ function BottomTabNavigator() {
           tabBarIcon: ({ color }) => <Ionicons name="ios-settings-outline" size={24} color={color} />,
         }}
       />
+
     </BottomTab.Navigator>
   );
 }

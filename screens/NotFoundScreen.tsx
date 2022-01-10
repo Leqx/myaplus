@@ -14,7 +14,7 @@ import { RootStackScreenProps ,AuthStackScreenProps} from '../types';
 export default function NotFoundScreen({ navigation }: AuthStackScreenProps<'Login'>) {
   const { isDarkmode, setTheme } = useTheme();
   return (
-    <View style={styles.container}>
+    <Layout>
        <View
             style={{
               flex: 1,
@@ -35,7 +35,7 @@ export default function NotFoundScreen({ navigation }: AuthStackScreenProps<'Log
       <TouchableOpacity onPress={() => navigation.replace('Login')} style={styles.link}>
         <Text style={styles.linkText}>Go to home screen!</Text>
       </TouchableOpacity>
-    </View>
+    </Layout>
   );
 }
 

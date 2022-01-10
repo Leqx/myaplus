@@ -30,6 +30,11 @@ const linking: LinkingOptions<RootStackParamList> = {
               SettingsScreen: 'settings',
             },
           },
+          Store: {
+            screens: {
+              StoreScreen: 'store',
+            },
+          },
         },
       },
       Services: 'services',
