@@ -10,8 +10,8 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-// import { Actionsheet, useDisclose, NativeBaseProvider, Modal } from "native-base"
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Layout,
   Button,
@@ -20,8 +20,8 @@ import {
   SectionContent,
   useTheme,
   themeColor,
-} from "react-native-rapi-ui";
-import {View } from '../components/Themed';
+} from 'react-native-rapi-ui';
+import { View } from '../components/Themed';
 // import {  CalendarList } from 'react-native-calendars';
 import moment from 'moment';
 import * as Calendar from 'expo-calendar';
@@ -35,23 +35,26 @@ import useStore from '../store/store';
 const datesWhitelist = [
   {
     start: moment(),
-    end: moment().add(365, 'days') // total 4 days enabled
-  }
+    end: moment().add(365, 'days'), // total 4 days enabled
+  },
 ];
 
 const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
-
-    const { updateSelectedTask, deleteSelectedTask, todo } = useStore(
-    (state: { updateSelectedTask: any; deleteSelectedTask: any; todo: any; }) => ({
+  const { updateSelectedTask, deleteSelectedTask, todo } = useStore(
+    (state: {
+      updateSelectedTask: any;
+      deleteSelectedTask: any;
+      todo: any;
+    }) => ({
       updateSelectedTask: state.updateSelectedTask,
       deleteSelectedTask: state.deleteSelectedTask,
-      todo: state.todo
+      todo: state.todo,
     })
   );
 
-    const [todoList, setTodoList] = useState([]);
-    const [markedDate, setMarkedDate] = useState([]);
-    const [currentDate, setCurrentDate] = useState(
+  const [todoList, setTodoList] = useState([]);
+  const [markedDate, setMarkedDate] = useState([]);
+  const [currentDate, setCurrentDate] = useState(
     `${moment().format('YYYY')}-${moment().format('MM')}-${moment().format(
       'DD'
     )}`
@@ -72,42 +75,48 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
           'MM'
         )}-${moment().format('DD')}`;
         const checkDate = moment(todayDate);
-        await oldTodo.filter((item: { date: moment.MomentInput; todoList: any[]; }) => {
-          const currDate = moment(item.date);
-          const checkedDate = checkDate.diff(currDate, 'days');
-          if (checkedDate > 0) {
-            item.todoList.forEach(async (listValue: { alarm: { createEventAsyncRes: { toString: () => string; }; }; }) => {
-              try {
-                await Calendar.deleteEventAsync(
-                  listValue.alarm.createEventAsyncRes.toString()
-                );
-              } catch (error) {
-                console.log(error);
-              }
-            });
-            return false;
+        await oldTodo.filter(
+          (item: { date: moment.MomentInput; todoList: any[] }) => {
+            const currDate = moment(item.date);
+            const checkedDate = checkDate.diff(currDate, 'days');
+            if (checkedDate > 0) {
+              item.todoList.forEach(
+                async (listValue: {
+                  alarm: { createEventAsyncRes: { toString: () => string } };
+                }) => {
+                  try {
+                    await Calendar.deleteEventAsync(
+                      listValue.alarm.createEventAsyncRes.toString()
+                    );
+                  } catch (error) {
+                    console.log(error);
+                  }
+                }
+              );
+              return false;
+            }
+            return true;
           }
-          return true;
-        });
+        );
 
-         await AsyncStorage.setItem('TODO', JSON.stringify(updatedList));
+        await AsyncStorage.setItem('TODO', JSON.stringify(updatedList));
         updateCurrentTask(currentDate);
       }
     } catch (error) {
       // Error retrieving data
-      console.error(error)
+      console.error(error);
     }
   };
 
   const handleModalVisible = () => {
     setModalVisible(!isModalVisible);
-   };
-  
+  };
+
   const updateCurrentTask = async (currentDate: string) => {
     try {
       if (todo !== [] && todo) {
-        const markDot = todo.map((item: { markedDot: any; }) => item.markedDot);
-        const todoLists = todo.filter((item: { date: any; }) => {
+        const markDot = todo.map((item: { markedDot: any }) => item.markedDot);
+        const todoLists = todo.filter((item: { date: any }) => {
           if (currentDate === item.date) {
             return true;
           }
@@ -146,14 +155,14 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     setSelectedTask(prevSelectedTask);
   };
 
-    const updateAlarm = async () => {
+  const updateAlarm = async () => {
     const calendarId = await createNewCalendar();
     const event = {
       title: selectedTask.title,
       notes: selectedTask.notes,
       startDate: moment(selectedTask?.alarm.time).add(0, 'm').toDate(),
       endDate: moment(selectedTask?.alarm.time).add(5, 'm').toDate(),
-      timeZone: Localization.timezone
+      timeZone: Localization.timezone,
     };
 
     if (!selectedTask?.alarm.createEventAsyncRes) {
@@ -180,7 +189,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     }
   };
 
-    const deleteAlarm = async () => {
+  const deleteAlarm = async () => {
     try {
       if (selectedTask?.alarm.createEventAsyncRes) {
         await Calendar.deleteEventAsync(
@@ -209,7 +218,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
       source: defaultCalendarSource,
       name: 'internal',
       accessLevel: Calendar.CalendarAccessLevel.OWNER,
-      ownerAccount: 'personal'
+      ownerAccount: 'personal',
     };
 
     let calendarId = null;
@@ -239,206 +248,198 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     <>
       {selectedTask !== null && (
         <Layout>
-        <Task {...{ setModalVisible, isModalVisible }}>
-          <DateTimePicker
-            isVisible={isDateTimePickerVisible}
-            onConfirm={handleDatePicked}
-            onCancel={hideDateTimePicker}
-            mode="time"
-            date={new Date()}
-            isDarkModeEnabled
-          />
-          <Section style={styles.taskContainer}>
-            <TextInput
-              style={styles.title}
-              onChangeText={(text) => {
-                let prevSelectedTask = JSON.parse(JSON.stringify(selectedTask));
-                prevSelectedTask.title = text;
-                setSelectedTask(prevSelectedTask);
-              }}
-              value={selectedTask.title}
-              placeholder="What do you need to study?"
+          <Task {...{ setModalVisible, isModalVisible }}>
+            <DateTimePicker
+              isVisible={isDateTimePickerVisible}
+              onConfirm={handleDatePicked}
+              onCancel={hideDateTimePicker}
+              mode='time'
+              date={new Date()}
+              isDarkModeEnabled
             />
-            <Text
-              style={{
-                fontSize: 14,
-                color: '#BDC6D8',
-                marginVertical: 10
-              }}
-            >
-              Suggestion
-            </Text>
-            <Section style={{ flexDirection: 'row' }}>
-              <View style={styles.readBook}>
-                <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                  Math
-                </Text>
-              </View>
-              <View style={styles.design}>
-                <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                  Physics
-                </Text>
-              </View>
-              <View style={styles.learn}>
-                <Text style={{ textAlign: 'center', fontSize: 14 }}>Learn</Text>
-              </View>
-            </Section>
-            <View style={styles.notesContent} />
-            <Section>
-              <Text
-                style={{
-                  color: '#9CAAC4',
-                  fontSize: 16,
-                  fontWeight: '600'
-                }}
-              >
-                Business
-              </Text>
+            <Section style={styles.taskContainer}>
               <TextInput
-                style={{
-                  height: 25,
-                  fontSize: 19,
-                  marginTop: 3
-                }}
+                style={styles.title}
                 onChangeText={(text) => {
                   let prevSelectedTask = JSON.parse(
                     JSON.stringify(selectedTask)
                   );
-                  prevSelectedTask.notes = text;
+                  prevSelectedTask.title = text;
                   setSelectedTask(prevSelectedTask);
                 }}
-                value={selectedTask.notes}
-                placeholder="Enter more info about the task."
+                value={selectedTask.title}
+                placeholder='What do you need to study?'
               />
-            </Section>
-            <View style={styles.separator} />
-            <Section>
               <Text
                 style={{
-                  color: '#9CAAC4',
-                  fontSize: 16,
-                  fontWeight: '600'
-                }}
-              >
-                Set Times
+                  fontSize: 14,
+                  color: '#BDC6D8',
+                  marginVertical: 10,
+                }}>
+                Suggestion
               </Text>
-              <TouchableOpacity
-                onPress={() => showDateTimePicker()}
-                style={{
-                  height: 25,
-                  marginTop: 3
-                }}
-              >
-                <Text style={{ fontSize: 19 }}>
-                  {moment(selectedTask?.alarm?.time || moment()).format(
-                    'h:mm A'
-                  )}
-                </Text>
-              </TouchableOpacity>
-            </Section>
-            <View style={styles.separator} />
-            <Section
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
+              <Section style={{ flexDirection: 'row' }}>
+                <View style={styles.readBook}>
+                  <Text style={{ textAlign: 'center', fontSize: 14 }}>
+                    Math
+                  </Text>
+                </View>
+                <View style={styles.design}>
+                  <Text style={{ textAlign: 'center', fontSize: 14 }}>
+                    Physics
+                  </Text>
+                </View>
+                <View style={styles.learn}>
+                  <Text style={{ textAlign: 'center', fontSize: 14 }}>
+                    Learn
+                  </Text>
+                </View>
+              </Section>
+              <View style={styles.notesContent} />
               <Section>
                 <Text
                   style={{
                     color: '#9CAAC4',
                     fontSize: 16,
-                    fontWeight: '600'
-                  }}
-                >
-                  Set Alarm
+                    fontWeight: '600',
+                  }}>
+                  Business
                 </Text>
-                <Section
+                <TextInput
                   style={{
                     height: 25,
-                    marginTop: 3
+                    fontSize: 19,
+                    marginTop: 3,
                   }}
-                >
+                  onChangeText={(text) => {
+                    let prevSelectedTask = JSON.parse(
+                      JSON.stringify(selectedTask)
+                    );
+                    prevSelectedTask.notes = text;
+                    setSelectedTask(prevSelectedTask);
+                  }}
+                  value={selectedTask.notes}
+                  placeholder='Enter more info about the task.'
+                />
+              </Section>
+              <View style={styles.separator} />
+              <Section>
+                <Text
+                  style={{
+                    color: '#9CAAC4',
+                    fontSize: 16,
+                    fontWeight: '600',
+                  }}>
+                  Set Times
+                </Text>
+                <TouchableOpacity
+                  onPress={() => showDateTimePicker()}
+                  style={{
+                    height: 25,
+                    marginTop: 3,
+                  }}>
                   <Text style={{ fontSize: 19 }}>
                     {moment(selectedTask?.alarm?.time || moment()).format(
                       'h:mm A'
                     )}
                   </Text>
-                </Section>
+                </TouchableOpacity>
               </Section>
-              <Switch
-                value={selectedTask?.alarm?.isOn || false}
-                onValueChange={handleAlarmSet}
-              />
-            </Section>
-            <Section
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <TouchableOpacity
-                onPress={async () => {
-                  handleModalVisible();
-                  console.log('isOn', selectedTask?.alarm.isOn);
-                  if (selectedTask?.alarm.isOn) {
-                    await updateAlarm();
-                  } else {
-                    await deleteAlarm();
-                  }
-                  await updateSelectedTask({
-                    date: currentDate,
-                    todo: selectedTask
-                  });
-                  updateCurrentTask(currentDate);
-                }}
-                style={styles.updateButton}
-              >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    textAlign: 'center',
-                    color: '#fff'
+              <View style={styles.separator} />
+              <Section
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                <Section>
+                  <Text
+                    style={{
+                      color: '#9CAAC4',
+                      fontSize: 16,
+                      fontWeight: '600',
+                    }}>
+                    Set Alarm
+                  </Text>
+                  <Section
+                    style={{
+                      height: 25,
+                      marginTop: 3,
+                    }}>
+                    <Text style={{ fontSize: 19 }}>
+                      {moment(selectedTask?.alarm?.time || moment()).format(
+                        'h:mm A'
+                      )}
+                    </Text>
+                  </Section>
+                </Section>
+                <Switch
+                  value={selectedTask?.alarm?.isOn || false}
+                  onValueChange={handleAlarmSet}
+                />
+              </Section>
+              <Section
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <TouchableOpacity
+                  onPress={async () => {
+                    handleModalVisible();
+                    console.log('isOn', selectedTask?.alarm.isOn);
+                    if (selectedTask?.alarm.isOn) {
+                      await updateAlarm();
+                    } else {
+                      await deleteAlarm();
+                    }
+                    await updateSelectedTask({
+                      date: currentDate,
+                      todo: selectedTask,
+                    });
+                    updateCurrentTask(currentDate);
                   }}
-                >
-                  UPDATE
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={async () => {
-                  handleModalVisible();
-                  deleteAlarm();
-                  await deleteSelectedTask({
-                    date: currentDate,
-                    todo: selectedTask
-                  });
-                  updateCurrentTask(currentDate);
-                }}
-                style={styles.deleteButton}
-              >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    textAlign: 'center',
-                    color: '#fff'
+                  style={styles.updateButton}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      textAlign: 'center',
+                      color: '#fff',
+                    }}>
+                    UPDATE
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={async () => {
+                    handleModalVisible();
+                    deleteAlarm();
+                    await deleteSelectedTask({
+                      date: currentDate,
+                      todo: selectedTask,
+                    });
+                    updateCurrentTask(currentDate);
                   }}
-                >
-                  DELETE
-                </Text>
-              </TouchableOpacity>
+                  style={styles.deleteButton}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      textAlign: 'center',
+                      color: '#fff',
+                    }}>
+                    DELETE
+                  </Text>
+                </TouchableOpacity>
+              </Section>
             </Section>
-          </Section>
-        </Task>
+          </Task>
         </Layout>
       )}
       <Layout>
-         <CalendarStrip
+        <CalendarStrip
           calendarAnimation={{ type: 'sequence', duration: 30 }}
           daySelectionAnimation={{
             type: 'background',
-            duration: 200
+            duration: 200,
           }}
           style={{
             height: 180,
@@ -460,11 +461,14 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
             paddingTop: 6,
             fontWeight: '400',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
           }}
           highlightDateNameStyle={{ color: themeColor.primary }}
           disabledDateNameStyle={{ color: themeColor.gray100 }}
-          disabledDateNumberStyle={{ color: themeColor.gray100, paddingTop: 10 }}
+          disabledDateNumberStyle={{
+            color: themeColor.gray100,
+            paddingTop: 10,
+          }}
           datesWhitelist={datesWhitelist}
           iconLeft={require('../assets/images/left-arrow.png')}
           iconRight={require('../assets/images/right-arrow.png')}
@@ -482,35 +486,32 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
           }}
         />
 
-          <TouchableOpacity
+        <TouchableOpacity
           onPress={() =>
             navigation.navigate('CreateSchedule', {
               updateCurrentTask: updateCurrentTask,
               currentDate,
-              createNewCalendar: createNewCalendar
+              createNewCalendar: createNewCalendar,
             })
           }
-          style={styles.viewTask}
-        >
+          style={styles.viewTask}>
           <Image
             source={require('../assets/images/plus.png')}
             style={{
               height: 30,
-              width: 30
+              width: 30,
             }}
           />
         </TouchableOpacity>
-           <Section
+        <Section
           style={{
             width: '100%',
-            height: Dimensions.get('window').height - 170
-          }}
-        >
+            height: Dimensions.get('window').height - 170,
+          }}>
           <ScrollView
             contentContainerStyle={{
-              paddingBottom: 20
-            }}
-          >
+              paddingBottom: 20,
+            }}>
             {todoList.map((item) => (
               <TouchableOpacity
                 onPress={() => {
@@ -519,38 +520,33 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                   getEvent();
                 }}
                 key={item.key}
-                style={styles.taskListContent}
-              >
+                style={styles.taskListContent}>
                 <SectionContent
                   style={{
                     marginLeft: 13,
-                    backgroundColor: 'transparent'
-                  }}
-                >
+                    backgroundColor: 'transparent',
+                  }}>
                   <View
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      backgroundColor: 'transparent'
-                    }}
-                  >
+                      backgroundColor: 'transparent',
+                    }}>
                     <View
                       style={{
                         height: 12,
                         width: 12,
                         borderRadius: 6,
                         backgroundColor: item.color,
-                        marginRight: 8
+                        marginRight: 8,
                       }}
                     />
                     <Text
-                    size='lg'
+                      size='lg'
                       style={{
                         color: '#554A4C',
                         fontWeight: '700',
-                       
-                      }}
-                    >
+                      }}>
                       {item.title}
                     </Text>
                   </View>
@@ -560,17 +556,13 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                         flexDirection: 'row',
                         marginLeft: 0,
                         backgroundColor: themeColor.primary300,
-                        
-                      }}
-                    >
+                      }}>
                       <Text
                         style={{
                           color: themeColor.black,
                           fontSize: 14,
                           marginRight: 5,
-                          
-                        }}
-                      >{`${moment(item.alarm.time).format('YYYY')}/${moment(
+                        }}>{`${moment(item.alarm.time).format('YYYY')}/${moment(
                         item.alarm.time
                       ).format('MM')}/${moment(item.alarm.time).format(
                         'DD'
@@ -579,8 +571,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                         style={{
                           fontSize: 14,
                           color: themeColor.black,
-                        }}
-                      >
+                        }}>
                         {item.notes}
                       </Text>
                     </View>
@@ -591,7 +582,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                     height: 80,
                     width: 5,
                     backgroundColor: item.color,
-                    borderRadius: 5
+                    borderRadius: 5,
                   }}
                 />
               </TouchableOpacity>
@@ -601,15 +592,14 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
       </Layout>
     </>
   );
-}
+};
 
-export default ScheduleScreen
-
+export default ScheduleScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 0
+    paddingTop: 0,
   },
   item: {
     backgroundColor: themeColor.white,
@@ -617,7 +607,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginRight: 10,
-    marginTop: 17
+    marginTop: 17,
   },
   emptyDate: {
     height: 15,
@@ -627,11 +617,11 @@ const styles = StyleSheet.create({
   },
   emptyDateWrapper: {
     flex: 1,
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   emptyDateText: {
     paddingLeft: 10,
-    fontSize: 15
+    fontSize: 15,
   },
   taskListContent: {
     height: 100,
@@ -644,14 +634,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     shadowOffset: {
       width: 3,
-      height: 3
+      height: 3,
     },
     shadowRadius: 5,
     shadowOpacity: 0.2,
     elevation: 3,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   viewTask: {
     position: 'absolute',
@@ -666,12 +656,12 @@ const styles = StyleSheet.create({
     shadowColor: '#2E66E7',
     shadowOffset: {
       width: 0,
-      height: 5
+      height: 5,
     },
     shadowRadius: 30,
     shadowOpacity: 0.5,
     elevation: 5,
-    zIndex: 999
+    zIndex: 999,
   },
   deleteButton: {
     backgroundColor: '#ff6347',
@@ -680,7 +670,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 40,
     borderRadius: 5,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   updateButton: {
     backgroundColor: '#2E66E7',
@@ -690,28 +680,28 @@ const styles = StyleSheet.create({
     marginTop: 40,
     borderRadius: 5,
     justifyContent: 'center',
-    marginRight: 20
+    marginRight: 20,
   },
   separator: {
     height: 0.5,
     width: '100%',
     backgroundColor: '#979797',
     alignSelf: 'center',
-    marginVertical: 20
+    marginVertical: 20,
   },
   notesContent: {
     height: 0.5,
     width: '100%',
     backgroundColor: '#979797',
     alignSelf: 'center',
-    marginVertical: 20
+    marginVertical: 20,
   },
   learn: {
     height: 23,
     width: 51,
     backgroundColor: '#F8D557',
     justifyContent: 'center',
-    borderRadius: 5
+    borderRadius: 5,
   },
   design: {
     height: 23,
@@ -719,7 +709,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#62CCFB',
     justifyContent: 'center',
     borderRadius: 5,
-    marginRight: 7
+    marginRight: 7,
   },
   readBook: {
     height: 23,
@@ -727,7 +717,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CD565',
     justifyContent: 'center',
     borderRadius: 5,
-    marginRight: 7
+    marginRight: 7,
   },
   title: {
     height: 25,
@@ -735,7 +725,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     paddingLeft: 8,
     fontSize: 19,
-    color: '#5DD976'
+    color: '#5DD976',
   },
   taskContainer: {
     height: 475,
@@ -746,14 +736,13 @@ const styles = StyleSheet.create({
     backgroundColor: themeColor.white,
     shadowOffset: {
       width: 3,
-      height: 3
+      height: 3,
     },
     shadowRadius: 20,
     shadowOpacity: 0.2,
     elevation: 5,
-    padding: 22
-  }
-  
+    padding: 22,
+  },
 });
 function handleDeletePreviousDayTask(todo: any) {
   throw new Error('Function not implemented.');
@@ -770,4 +759,3 @@ function createNewCalendar() {
 function updatedList(updatedList: any): string {
   throw new Error('Function not implemented.');
 }
-

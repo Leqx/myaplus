@@ -1,5 +1,5 @@
-import React from "react"
+import React from 'react';
 
-const UnitsContext = React.createContext({})
+const UnitsContext = React.createContext({});
 
-export default UnitsContext
+export default UnitsContext;
