@@ -1,11 +1,17 @@
 import React from 'react';
 import ProductContext from './product-context';
-import productReducer from './product-reducer';
+import { productReducer, cartReducer } from './product-reducer';
 import {
   GET_PRODUCTS,
   ADD_TO_CART,
   REMOVE_FROM_CART,
   CHANGE_CART_QTY,
+  SORT_BY_PRICE,
+  FILTER_BY_STOCK,
+  FILTER_BY_DELIVERY,
+  FILTER_BY_RATING,
+  FILTER_BY_SEARCH,
+  CLEAR_FILTERS,
 } from './product-actions';
 
 export default function ProductState(props: {
@@ -22,38 +28,27 @@ export default function ProductState(props: {
     cart: [],
   };
 
-  const [productState, dispatch] = React.useReducer(
-    productReducer,
+  // const [productState, dispatch] = React.useReducer(
+  //   productReducer,
+  //   productInitialState
+  // );
+
+  const [cartState, dispatch] = React.useReducer(
+    cartReducer,
     productInitialState
   );
 
   // get products
-  const getProducts = (products: []) => {
-    dispatch({
-      type: GET_PRODUCTS,
-    });
-  };
+  const getProducts = (products: []) => {};
 
   // add to cart
-  const addToCart = (cart: []) => {
-    dispatch({
-      type: ADD_TO_CART,
-    });
-  };
+  const addToCart = (cart: []) => {};
 
   // remove from cart
-  const removeFromCart = (cart: []) => {
-    dispatch({
-      type: REMOVE_FROM_CART,
-    });
-  };
+  const removeFromCart = (cart: []) => {};
 
   // change qty
-  const changeCartQty = (cart: []) => {
-    dispatch({
-      type: CHANGE_CART_QTY,
-    });
-  };
+  const changeCartQty = (cart: []) => {};
 
   return (
     <ProductContext.Provider
@@ -61,7 +56,7 @@ export default function ProductState(props: {
         addToCart,
         removeFromCart,
         changeCartQty,
-        productState,
+        cartState,
       }}>
       {props.children}
     </ProductContext.Provider>

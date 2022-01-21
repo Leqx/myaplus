@@ -4,27 +4,34 @@
  */
 
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
+import {
+  CompositeScreenProps,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList { }
+    interface RootParamList extends RootStackParamList {}
   }
 }
 
+export type CreateScheduleParams = {
+  updateCurrentTask: (currentDate: string) => Promise<void>;
+  currentDate: Date;
+  createNewCalendar: () => Promise<string | null>;
+};
+
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
-  CreateSchedule: undefined;
+  CreateSchedule: CreateScheduleParams;
   Modal: undefined;
   NotFound: undefined;
   Services: undefined;
 };
 
-export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
-  RootStackParamList,
-  Screen
->;
+export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
+  NativeStackScreenProps<RootStackParamList, Screen>;
 
 export type RootTabParamList = {
   Explore: undefined;
@@ -33,10 +40,11 @@ export type RootTabParamList = {
   Store: undefined;
 };
 
-export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
-  BottomTabScreenProps<RootTabParamList, Screen>,
-  NativeStackScreenProps<RootStackParamList>
->;
+export type RootTabScreenProps<Screen extends keyof RootTabParamList> =
+  CompositeScreenProps<
+    BottomTabScreenProps<RootTabParamList, Screen>,
+    NativeStackScreenProps<RootStackParamList>
+  >;
 
 export type AuthStackParamList = {
   Register: undefined;
@@ -44,7 +52,5 @@ export type AuthStackParamList = {
   ForgotPassword: undefined;
 };
 
-export type AuthStackScreenProps<Screen extends keyof AuthStackParamList> = NativeStackScreenProps<
-  AuthStackParamList,
-  Screen
->;
+export type AuthStackScreenProps<Screen extends keyof AuthStackParamList> =
+  NativeStackScreenProps<AuthStackParamList, Screen>;

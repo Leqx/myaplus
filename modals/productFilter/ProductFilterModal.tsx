@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { themeColor, Text, Picker, CheckBox } from 'react-native-rapi-ui';
-import { View } from '../Themed';
+import { View } from '../../components/Themed';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import Slider from '@react-native-community/slider';
 import {
@@ -25,36 +25,7 @@ import {
 
 const { width, height } = Dimensions.get('screen');
 
-const FirstRoute = () => {
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: 'transparent',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <>
-        <Text>filter</Text>
-      </>
-    </View>
-  );
-};
-
-const SecondRoute = () => {
-  return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-      <Text>filter</Text>
-    </View>
-  );
-};
-
-const renderScene = SceneMap({
-  first: FirstRoute,
-  second: SecondRoute,
-});
-
-export default function ModalPage(item: any) {
+export default function ProductFilterModal(item: any) {
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
 
   const layout = useWindowDimensions();
@@ -90,41 +61,22 @@ export default function ModalPage(item: any) {
           </View>
 
           <View style={styles.tabs}>
-            <Text>Sort by</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginVertical: 15,
-                backgroundColor: 'transparent',
-              }}>
-              <CheckBox
-                value={checkBox}
-                onValueChange={(val) => setCheckbox(val)}
+            <>
+              <Text>Price Range </Text>
+            </>
+            <>
+              <Slider
+                style={{ width: 300, height: 40 }}
+                minimumValue={0}
+                maximumValue={1}
+                minimumTrackTintColor='#FFFFFF'
+                maximumTrackTintColor='#000000'
               />
-              <Text size='md' style={{ marginLeft: 15, color: 'white' }}>
-                {'    '}
-                Scheduled
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: 'transparent',
-              }}>
-              <CheckBox
-                value={checkBox}
-                onValueChange={(val) => setCheckbox(val)}
-              />
-              <Text size='md' style={{ marginLeft: 10, color: 'white' }}>
-                Unscheduled
-              </Text>
-            </View>
+            </>
           </View>
           <View style={styles.tabs}>
             <>
-              <Text style={{ marginBottom: 10 }}>Subjects </Text>
+              <Text style={{ marginBottom: 10 }}>Category </Text>
             </>
             <>
               <Picker
@@ -136,7 +88,7 @@ export default function ModalPage(item: any) {
             </>
           </View>
           <View style={styles.tabs}>
-            <Text>Select by</Text>
+            <Text>Promotions</Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -147,29 +99,17 @@ export default function ModalPage(item: any) {
                 value={checkBox}
                 onValueChange={(val) => setCheckbox(val)}
               />
-              <Text
-                size='md'
-                style={{
-                  marginLeft: 10,
-                  color: 'white',
-                  backgroundColor: 'transparent',
-                }}>
-                {'    '}
-                Read
+              <Text size='md' style={{ marginLeft: 10, color: 'white' }}>
+                Save 20% off
               </Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: 'transparent',
-              }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <CheckBox
                 value={checkBox}
                 onValueChange={(val) => setCheckbox(val)}
               />
               <Text size='md' style={{ marginLeft: 10, color: 'white' }}>
-                Unread
+                Item Bundles
               </Text>
             </View>
           </View>

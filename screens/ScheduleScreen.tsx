@@ -4,6 +4,7 @@ import {
   Dimensions,
   Image,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Switch,
@@ -39,6 +40,26 @@ const datesWhitelist = [
   },
 ];
 
+type Alarm = {
+  time: string;
+  isOn: boolean;
+  createEventAsyncRes: string;
+};
+
+type Task = {
+  alarm: Alarm;
+  title: string;
+  notes: string;
+};
+
+interface Todo {
+  key: string;
+  alarm: Alarm;
+  title: string;
+  notes: string;
+  color: string;
+}
+
 const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
   const { updateSelectedTask, deleteSelectedTask, todo } = useStore(
     (state: {
@@ -52,17 +73,28 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     })
   );
 
-  const [todoList, setTodoList] = useState([]);
+  const [todoList, setTodoList] = useState<Todo[]>([]);
   const [markedDate, setMarkedDate] = useState([]);
-  const [currentDate, setCurrentDate] = useState(
-    `${moment().format('YYYY')}-${moment().format('MM')}-${moment().format(
-      'DD'
-    )}`
-  );
+  const [currentDate, setCurrentDate] = useState<Date>(moment().toDate());
 
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [isDateTimePickerVisible, setDateTimePickerVisible] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<null | Task>(null);
+
+  const [isModalVisible, setModalVisible] = useState<boolean>(false);
+  const [isDateTimePickerVisible, setDateTimePickerVisible] =
+    useState<boolean>(false);
+  const showDateTimePicker = () => setDateTimePickerVisible(true);
+
+  const hideDateTimePicker = () => setDateTimePickerVisible(false);
+  const handleDatePicked = (date: moment.MomentInput) => {
+    let prevSelectedTask = JSON.parse(JSON.stringify(selectedTask));
+    const selectedDatePicked = prevSelectedTask.alarm.time;
+    const hour = moment(date).hour();
+    const minute = moment(date).minute();
+    let newModifiedDay = moment(selectedDatePicked).hour(hour).minute(minute);
+    prevSelectedTask.alarm.time = newModifiedDay;
+    setSelectedTask(prevSelectedTask);
+    hideDateTimePicker();
+  };
 
   useEffect(() => {
     handleDeletePreviousDayTask(todo);
@@ -100,16 +132,12 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
         );
 
         await AsyncStorage.setItem('TODO', JSON.stringify(updatedList));
-        updateCurrentTask(currentDate);
+        updateCurrentTask(currentDate.toString());
       }
     } catch (error) {
       // Error retrieving data
       console.error(error);
     }
-  };
-
-  const handleModalVisible = () => {
-    setModalVisible(!isModalVisible);
   };
 
   const updateCurrentTask = async (currentDate: string) => {
@@ -134,21 +162,6 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     }
   };
 
-  const showDateTimePicker = () => setDateTimePickerVisible(true);
-
-  const hideDateTimePicker = () => setDateTimePickerVisible(false);
-
-  const handleDatePicked = (date: moment.MomentInput) => {
-    let prevSelectedTask = JSON.parse(JSON.stringify(selectedTask));
-    const selectedDatePicked = prevSelectedTask.alarm.time;
-    const hour = moment(date).hour();
-    const minute = moment(date).minute();
-    let newModifiedDay = moment(selectedDatePicked).hour(hour).minute(minute);
-    prevSelectedTask.alarm.time = newModifiedDay;
-    setSelectedTask(prevSelectedTask);
-    hideDateTimePicker();
-  };
-
   const handleAlarmSet = () => {
     let prevSelectedTask = JSON.parse(JSON.stringify(selectedTask));
     prevSelectedTask.alarm.isOn = !prevSelectedTask.alarm.isOn;
@@ -158,8 +171,8 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
   const updateAlarm = async () => {
     const calendarId = await createNewCalendar();
     const event = {
-      title: selectedTask.title,
-      notes: selectedTask.notes,
+      title: selectedTask?.title,
+      notes: selectedTask?.notes,
       startDate: moment(selectedTask?.alarm.time).add(0, 'm').toDate(),
       endDate: moment(selectedTask?.alarm.time).add(5, 'm').toDate(),
       timeZone: Localization.timezone,
@@ -168,7 +181,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     if (!selectedTask?.alarm.createEventAsyncRes) {
       try {
         const createEventAsyncRes = await Calendar.createEventAsync(
-          calendarId.toString(),
+          calendarId!.toString(),
           event
         );
         let updateTask = JSON.parse(JSON.stringify(selectedTask));
@@ -207,15 +220,15 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
   const createNewCalendar = async () => {
     const defaultCalendarSource =
       Platform.OS === 'ios'
-        ? await Calendar.getDefaultCalendarAsync(Calendar.EntityTypes.EVENT)
-        : { isLocalAccount: true, name: 'Google Calendar' };
+        ? await Calendar.getDefaultCalendarAsync()
+        : { isLocalAccount: true, name: 'Google Calendar', sourceId: '' };
 
     const newCalendar = {
       title: 'Personal',
       entityType: Calendar.EntityTypes.EVENT,
       color: '#2196F3',
       sourceId: defaultCalendarSource?.sourceId || undefined,
-      source: defaultCalendarSource,
+      sourceName: defaultCalendarSource.name || undefined,
       name: 'internal',
       accessLevel: Calendar.CalendarAccessLevel.OWNER,
       ownerAccount: 'personal',
@@ -225,8 +238,8 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
 
     try {
       calendarId = await Calendar.createCalendarAsync(newCalendar);
-    } catch (e) {
-      Alert.alert(e);
+    } catch (err) {
+      Alert.alert(`Error ${err}`);
     }
 
     return calendarId;
@@ -244,19 +257,31 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
     }
   };
 
+  const handleModalVisible = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const params = {
+    updateCurrentTask: updateCurrentTask,
+    currentDate,
+    createNewCalendar: createNewCalendar,
+  };
+
   return (
     <>
       {selectedTask !== null && (
-        <Layout>
-          <Task {...{ setModalVisible, isModalVisible }}>
-            <DateTimePicker
-              isVisible={isDateTimePickerVisible}
-              onConfirm={handleDatePicked}
-              onCancel={hideDateTimePicker}
-              mode='time'
-              date={new Date()}
-              isDarkModeEnabled
-            />
+        <>
+          <Layout>
+            <Task {...{ setModalVisible, isModalVisible }}>
+              <DateTimePicker
+                isVisible={isDateTimePickerVisible}
+                onConfirm={handleDatePicked}
+                onCancel={hideDateTimePicker}
+                mode='time'
+                date={new Date()}
+                isDarkModeEnabled
+              />
+            </Task>
             <Section style={styles.taskContainer}>
               <TextInput
                 style={styles.title}
@@ -281,17 +306,22 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
               <Section style={{ flexDirection: 'row' }}>
                 <View style={styles.readBook}>
                   <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                    Math
+                    {' '}
+                    Math{' '}
                   </Text>
                 </View>
+
                 <View style={styles.design}>
                   <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                    Physics
+                    {' '}
+                    Physics{' '}
                   </Text>
                 </View>
+
                 <View style={styles.learn}>
                   <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                    Learn
+                    {' '}
+                    Learn{' '}
                   </Text>
                 </View>
               </Section>
@@ -346,6 +376,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                 </TouchableOpacity>
               </Section>
               <View style={styles.separator} />
+
               <Section
                 style={{
                   flexDirection: 'row',
@@ -378,6 +409,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                   onValueChange={handleAlarmSet}
                 />
               </Section>
+
               <Section
                 style={{
                   flexDirection: 'row',
@@ -397,7 +429,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                       date: currentDate,
                       todo: selectedTask,
                     });
-                    updateCurrentTask(currentDate);
+                    updateCurrentTask(currentDate.toString());
                   }}
                   style={styles.updateButton}>
                   <Text
@@ -417,7 +449,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                       date: currentDate,
                       todo: selectedTask,
                     });
-                    updateCurrentTask(currentDate);
+                    updateCurrentTask(currentDate.toString());
                   }}
                   style={styles.deleteButton}>
                   <Text
@@ -431,163 +463,165 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
                 </TouchableOpacity>
               </Section>
             </Section>
-          </Task>
-        </Layout>
+          </Layout>
+        </>
       )}
       <Layout>
-        <CalendarStrip
-          calendarAnimation={{ type: 'sequence', duration: 30 }}
-          daySelectionAnimation={{
-            type: 'background',
-            duration: 200,
-          }}
-          style={{
-            height: 180,
-            paddingTop: 20,
-            paddingBottom: 20,
-          }}
-          calendarHeaderStyle={{ color: themeColor.primary }}
-          dateNumberStyle={{ color: themeColor.gray200, paddingTop: 10 }}
-          dateNameStyle={{ color: themeColor.gray100 }}
-          highlightDateNumberStyle={{
-            color: themeColor.white,
-            backgroundColor: themeColor.primary,
-            marginTop: 10,
-            height: 35,
-            width: 35,
-            textAlign: 'center',
-            borderRadius: 17.5,
-            overflow: 'hidden',
-            paddingTop: 6,
-            fontWeight: '400',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-          highlightDateNameStyle={{ color: themeColor.primary }}
-          disabledDateNameStyle={{ color: themeColor.gray100 }}
-          disabledDateNumberStyle={{
-            color: themeColor.gray100,
-            paddingTop: 10,
-          }}
-          datesWhitelist={datesWhitelist}
-          iconLeft={require('../assets/images/left-arrow.png')}
-          iconRight={require('../assets/images/right-arrow.png')}
-          iconContainer={{ flex: 0.1 }}
-          // If you get this error => undefined is not an object (evaluating 'datesList[_this.state.numVisibleDays - 1].date')
-          // temp: https://github.com/BugiDev/react-native-calendar-strip/issues/303#issuecomment-864510769
-          markedDates={markedDate}
-          selectedDate={currentDate}
-          onDateSelected={(date) => {
-            const selectedDate = `${moment(date).format('YYYY')}-${moment(
-              date
-            ).format('MM')}-${moment(date).format('DD')}`;
-            updateCurrentTask(selectedDate);
-            setCurrentDate(selectedDate);
-          }}
-        />
-
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('CreateSchedule', {
-              updateCurrentTask: updateCurrentTask,
-              currentDate,
-              createNewCalendar: createNewCalendar,
-            })
-          }
-          style={styles.viewTask}>
-          <Image
-            source={require('../assets/images/plus.png')}
+        <Section>
+          <CalendarStrip
+            scrollable={true}
+            calendarAnimation={{ type: 'sequence', duration: 30 }}
+            daySelectionAnimation={{
+              type: 'background',
+              duration: 200,
+              highlightColor: 'transparent',
+            }}
             style={{
-              height: 30,
-              width: 30,
+              height: 180,
+              paddingTop: 20,
+              paddingBottom: 20,
+            }}
+            calendarHeaderStyle={{ color: themeColor.gray200 }}
+            dateNumberStyle={{ color: themeColor.gray200, paddingTop: 10 }}
+            dateNameStyle={{ color: themeColor.gray100 }}
+            highlightDateNumberStyle={{
+              color: themeColor.white,
+              backgroundColor: themeColor.primary,
+              marginTop: 10,
+              height: 45,
+              width: 35,
+              textAlign: 'center',
+              borderRadius: 7.5,
+              overflow: 'hidden',
+              paddingTop: 6,
+              fontWeight: '400',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            highlightDateNameStyle={{ color: themeColor.primary }}
+            disabledDateNameStyle={{ color: themeColor.gray100 }}
+            disabledDateNumberStyle={{
+              color: themeColor.gray100,
+              paddingTop: 10,
+            }}
+            datesWhitelist={datesWhitelist}
+            iconLeft={require('../assets/images/left-arrow.png')}
+            iconRight={require('../assets/images/right-arrow.png')}
+            iconContainer={{ flex: 0.1 }}
+            markedDates={markedDate}
+            selectedDate={currentDate}
+            onDateSelected={(date) => {
+              const selectedDate = moment().toDate();
+              updateCurrentTask(selectedDate.toString());
+              setCurrentDate(selectedDate);
             }}
           />
-        </TouchableOpacity>
-        <Section
-          style={{
-            width: '100%',
-            height: Dimensions.get('window').height - 170,
-          }}>
-          <ScrollView
-            contentContainerStyle={{
-              paddingBottom: 20,
+
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('CreateSchedule', {
+                updateCurrentTask: updateCurrentTask,
+                currentDate,
+                createNewCalendar: createNewCalendar,
+              })
+            }
+            style={styles.viewTask}>
+            <Image
+              source={require('../assets/images/plus.png')}
+              style={{
+                height: 30,
+                width: 30,
+              }}
+            />
+          </TouchableOpacity>
+
+          <Section
+            style={{
+              width: '100%',
+              height: Dimensions.get('window').height,
             }}>
-            {todoList.map((item) => (
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedTask(item);
-                  setModalVisible(true);
-                  getEvent();
-                }}
-                key={item.key}
-                style={styles.taskListContent}>
-                <SectionContent
-                  style={{
-                    marginLeft: 13,
-                    backgroundColor: 'transparent',
-                  }}>
-                  <View
+            <ScrollView
+              contentContainerStyle={{
+                paddingBottom: 20,
+                paddingHorizontal: 20,
+              }}>
+              {todoList.map((item) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedTask(item);
+                    setModalVisible(true);
+                    getEvent();
+                  }}
+                  key={item.key}
+                  style={styles.taskListContent}>
+                  <SectionContent
                     style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
+                      marginLeft: 13,
                       backgroundColor: 'transparent',
                     }}>
                     <View
                       style={{
-                        height: 12,
-                        width: 12,
-                        borderRadius: 6,
-                        backgroundColor: item.color,
-                        marginRight: 8,
-                      }}
-                    />
-                    <Text
-                      size='lg'
-                      style={{
-                        color: '#554A4C',
-                        fontWeight: '700',
-                      }}>
-                      {item.title}
-                    </Text>
-                  </View>
-                  <View>
-                    <View
-                      style={{
                         flexDirection: 'row',
-                        marginLeft: 0,
-                        backgroundColor: themeColor.primary300,
+                        alignItems: 'center',
+                        backgroundColor: 'transparent',
                       }}>
-                      <Text
+                      <View
                         style={{
-                          color: themeColor.black,
-                          fontSize: 14,
-                          marginRight: 5,
-                        }}>{`${moment(item.alarm.time).format('YYYY')}/${moment(
-                        item.alarm.time
-                      ).format('MM')}/${moment(item.alarm.time).format(
-                        'DD'
-                      )}`}</Text>
+                          height: 12,
+                          width: 12,
+                          borderRadius: 6,
+                          backgroundColor: item.color,
+                          marginRight: 8,
+                        }}
+                      />
                       <Text
+                        size='lg'
                         style={{
-                          fontSize: 14,
-                          color: themeColor.black,
+                          color: '#554A4C',
+                          fontWeight: '700',
                         }}>
-                        {item.notes}
+                        {item.title}
                       </Text>
                     </View>
-                  </View>
-                </SectionContent>
-                <View
-                  style={{
-                    height: 80,
-                    width: 5,
-                    backgroundColor: item.color,
-                    borderRadius: 5,
-                  }}
-                />
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+                    <View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          marginLeft: 0,
+                          backgroundColor: themeColor.primary300,
+                        }}>
+                        <Text
+                          style={{
+                            color: themeColor.black,
+                            fontSize: 14,
+                            marginRight: 5,
+                          }}>{`${moment(item.alarm.time).format(
+                          'YYYY'
+                        )}/${moment(item.alarm.time).format('MM')}/${moment(
+                          item.alarm.time
+                        ).format('DD')}`}</Text>
+                        <Text
+                          style={{
+                            fontSize: 14,
+                            color: themeColor.black,
+                          }}>
+                          {item.notes}
+                        </Text>
+                      </View>
+                    </View>
+                  </SectionContent>
+                  <View
+                    style={{
+                      height: 80,
+                      width: 5,
+                      backgroundColor: item.color,
+                      borderRadius: 5,
+                    }}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </Section>
         </Section>
       </Layout>
     </>
@@ -601,59 +635,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 0,
   },
-  item: {
-    backgroundColor: themeColor.white,
-    flex: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    marginTop: 17,
-  },
-  emptyDate: {
-    height: 15,
-    flex: 1,
-    paddingTop: 30,
-    paddingLeft: 30,
-  },
-  emptyDateWrapper: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  emptyDateText: {
-    paddingLeft: 10,
-    fontSize: 15,
-  },
-  taskListContent: {
-    height: 100,
-    width: 327,
-    alignSelf: 'center',
-    borderRadius: 10,
-    shadowColor: '#2E66E7',
-    backgroundColor: themeColor.primary300,
-    marginTop: 10,
-    marginBottom: 10,
-    shadowOffset: {
-      width: 3,
-      height: 3,
-    },
-    shadowRadius: 5,
-    shadowOpacity: 0.2,
-    elevation: 3,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   viewTask: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 250,
     right: 17,
     height: 60,
     width: 60,
-    backgroundColor: '#2E66E7',
+    backgroundColor: themeColor.primary,
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#2E66E7',
+    shadowColor: themeColor.primary,
     shadowOffset: {
       width: 0,
       height: 5,
@@ -663,38 +655,29 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 999,
   },
-  deleteButton: {
-    backgroundColor: '#ff6347',
-    width: 100,
-    height: 38,
+  taskContainer: {
+    height: 475,
+    width: 327,
     alignSelf: 'center',
-    marginTop: 40,
-    borderRadius: 5,
-    justifyContent: 'center',
+    borderRadius: 20,
+    shadowColor: themeColor.primary,
+    backgroundColor: themeColor.white,
+    shadowOffset: {
+      width: 3,
+      height: 3,
+    },
+    shadowRadius: 20,
+    shadowOpacity: 0.2,
+    elevation: 5,
+    padding: 22,
   },
-  updateButton: {
-    backgroundColor: '#2E66E7',
-    width: 100,
-    height: 38,
-    alignSelf: 'center',
-    marginTop: 40,
-    borderRadius: 5,
-    justifyContent: 'center',
-    marginRight: 20,
-  },
-  separator: {
-    height: 0.5,
-    width: '100%',
-    backgroundColor: '#979797',
-    alignSelf: 'center',
-    marginVertical: 20,
-  },
-  notesContent: {
-    height: 0.5,
-    width: '100%',
-    backgroundColor: '#979797',
-    alignSelf: 'center',
-    marginVertical: 20,
+  title: {
+    height: 25,
+    borderColor: themeColor.success,
+    borderLeftWidth: 1,
+    paddingLeft: 8,
+    fontSize: 19,
+    color: themeColor.success,
   },
   learn: {
     height: 23,
@@ -719,31 +702,61 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 7,
   },
-  title: {
-    height: 25,
-    borderColor: '#5DD976',
-    borderLeftWidth: 1,
-    paddingLeft: 8,
-    fontSize: 19,
-    color: '#5DD976',
+  notesContent: {
+    height: 0.5,
+    width: '100%',
+    backgroundColor: themeColor.gray,
+    alignSelf: 'center',
+    marginVertical: 20,
   },
-  taskContainer: {
-    height: 475,
+  separator: {
+    height: 0.5,
+    width: '100%',
+    backgroundColor: themeColor.gray,
+    alignSelf: 'center',
+    marginVertical: 20,
+  },
+  deleteButton: {
+    backgroundColor: '#ff6347',
+    width: 100,
+    height: 38,
+    alignSelf: 'center',
+    marginTop: 40,
+    borderRadius: 5,
+    justifyContent: 'center',
+  },
+  updateButton: {
+    backgroundColor: '#2E66E7',
+    width: 100,
+    height: 38,
+    alignSelf: 'center',
+    marginTop: 40,
+    borderRadius: 5,
+    justifyContent: 'center',
+    marginRight: 20,
+  },
+  taskListContent: {
+    height: 100,
     width: 327,
     alignSelf: 'center',
-    borderRadius: 20,
+    borderRadius: 10,
     shadowColor: '#2E66E7',
-    backgroundColor: themeColor.white,
+    backgroundColor: themeColor.primary300,
+    marginTop: 10,
+    marginBottom: 10,
     shadowOffset: {
       width: 3,
       height: 3,
     },
-    shadowRadius: 20,
+    shadowRadius: 5,
     shadowOpacity: 0.2,
-    elevation: 5,
-    padding: 22,
+    elevation: 3,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
+
 function handleDeletePreviousDayTask(todo: any) {
   throw new Error('Function not implemented.');
 }

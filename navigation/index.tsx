@@ -3,12 +3,22 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import React, { useContext, useEffect} from 'react';
-import { FontAwesome,Fontisto,FontAwesome5,MaterialIcons, MaterialCommunityIcons  } from '@expo/vector-icons';
+import React, { useContext, useEffect } from 'react';
+import {
+  FontAwesome,
+  Fontisto,
+  FontAwesome5,
+  MaterialIcons,
+  MaterialCommunityIcons,
+} from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ColorSchemeName, Pressable,StyleSheet } from 'react-native';
+import { ColorSchemeName, Pressable, StyleSheet } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -19,13 +29,18 @@ import ScheduleScreen from '../screens/ScheduleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import ServicesScreen from '../screens/ServicesScreen';
 import CreateScheduleScreen from '../screens/CreateScheduleScreen';
-import { RootStackParamList, RootTabParamList, RootTabScreenProps,AuthStackParamList } from '../types';
+import {
+  RootStackParamList,
+  RootTabParamList,
+  RootTabScreenProps,
+  AuthStackParamList,
+} from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import RegisterScreen from '../screens/RegisterScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import LoginScreen from '../screens/LoginScreen';
 import Loading from '../screens/utils/Loading';
-import StoreScreen from '../screens/StoreScreen'
+import StoreScreen from '../screens/StoreScreen';
 import {
   Layout,
   Button,
@@ -35,16 +50,19 @@ import {
   SectionContent,
   useTheme,
   themeColor,
-} from "react-native-rapi-ui";
+} from 'react-native-rapi-ui';
 
 import { AuthContext } from '../auth/context/AuthContext';
-import { auth } from "../initFirebase";
-import {onAuthStateChanged} from "firebase/auth"
+import { auth } from '../initFirebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 import { Ionicons } from '@expo/vector-icons';
 
-
-export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
+export default function Navigation({
+  colorScheme,
+}: {
+  colorScheme: ColorSchemeName;
+}) {
   // const { user} = useContext(AuthContext);
   // {user == null && <Loading />}
 
@@ -52,28 +70,26 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
   const user = useContext(AuthContext);
   const { isDarkmode, setTheme } = useTheme();
 
-
   useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      console.log('user status changed:', user);
+      setLoading(false);
+    });
 
-    onAuthStateChanged(auth,(user)=> {
-      console.log('user status changed:',user)
-      setLoading(false)
-    })
-     
     return () => {
-      console.log('unsub')
-    }
-  }, [user])
+      console.log('unsub');
+    };
+  }, [user]);
 
-  console.log(user)
+  console.log(user);
 
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-       {loading && <Loading />}
-       {!user && !loading && <AuthStackNavigator />}
-			 {user && !loading && <RootNavigator  />}
+      {loading && <Loading />}
+      {!user && !loading && <AuthStackNavigator />}
+      {user && !loading && <RootNavigator />}
     </NavigationContainer>
   );
 }
@@ -87,11 +103,23 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function RootNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+      <Stack.Screen
+        name='Root'
+        component={BottomTabNavigator}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name='NotFound'
+        component={NotFoundScreen}
+        options={{ title: 'Oops!' }}
+      />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-        <Stack.Screen name="Services" component={ServicesScreen} options={{ title: '' }} />
+        <Stack.Screen name='Modal' component={ModalScreen} />
+        <Stack.Screen
+          name='Services'
+          component={ServicesScreen}
+          options={{ title: '' }}
+        />
       </Stack.Group>
     </Stack.Navigator>
   );
@@ -99,26 +127,46 @@ function RootNavigator() {
 
 const ScheduleStack = createNativeStackNavigator();
 
-function ScheduleStackNavigator(){
-  return(
-    <ScheduleStack.Navigator >
-       <ScheduleStack.Screen name="Schedule" component={ScheduleScreen}  options={{ headerShown: false }}/>
-      <ScheduleStack.Screen name="CreateSchedule" component={CreateScheduleScreen} options={{ headerShown: false }} />
+function ScheduleStackNavigator() {
+  return (
+    <ScheduleStack.Navigator>
+      <ScheduleStack.Screen
+        name='ScheduleMain'
+        component={ScheduleScreen}
+        options={{ headerShown: false }}
+      />
+      <ScheduleStack.Screen
+        name='CreateSchedule'
+        component={CreateScheduleScreen}
+        options={{ headerShown: false }}
+      />
     </ScheduleStack.Navigator>
-  )
+  );
 }
 
-const AuthStack = createNativeStackNavigator<AuthStackParamList>()
+const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
- function AuthStackNavigator(){
-   return(
-     <AuthStack.Navigator>
-       <AuthStack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
-       <AuthStack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-       <AuthStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerShown: false }} /> 
-     </AuthStack.Navigator>
-   )
- }
+function AuthStackNavigator() {
+  return (
+    <AuthStack.Navigator>
+      <AuthStack.Screen
+        name='Register'
+        component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
+      <AuthStack.Screen
+        name='Login'
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+      <AuthStack.Screen
+        name='ForgotPassword'
+        component={ForgotPasswordScreen}
+        options={{ headerShown: false }}
+      />
+    </AuthStack.Navigator>
+  );
+}
 
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
@@ -131,23 +179,23 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="Explore"
+      initialRouteName='Explore'
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].background,
         tabBarInactiveBackgroundColor: Colors[colorScheme].background,
         tabBarActiveBackgroundColor: Colors[colorScheme].tint,
-        tabBarShowLabel: false
-      
-      }}
-      >
+        tabBarShowLabel: false,
+      }}>
       <BottomTab.Screen
-        name="Explore"
+        name='Explore'
         component={ExploreScreen}
         options={({ navigation }: RootTabScreenProps<'Explore'>) => ({
           title: 'Explore',
           headerShown: false,
-          tabBarLabelStyle: {color: themeColor.gray500},
-          tabBarIcon: ({ color }) => <Ionicons  name="ios-search-outline" size={24} color={color} />,
+          tabBarLabelStyle: { color: themeColor.gray500 },
+          tabBarIcon: ({ color }) => (
+            <Ionicons name='ios-search-outline' size={24} color={color} />
+          ),
           headerRight: () => (
             <Pressable
               onPress={() => navigation.navigate('Modal')}
@@ -164,44 +212,48 @@ function BottomTabNavigator() {
               />
 
                 */}
-
             </Pressable>
           ),
         })}
       />
       <BottomTab.Screen
-        name="Schedule"
+        name='Schedule'
         component={ScheduleStackNavigator}
         options={{
           title: 'Schedule',
           headerShown: false,
           tabBarBadge: 3,
-          tabBarBadgeStyle:{backgroundColor: themeColor.primary500} ,
-          tabBarLabelStyle: {color: themeColor.gray500},
-          tabBarIcon: ({ color }) => <Ionicons name="ios-time-outline" size={24} color={color} />,
+          tabBarBadgeStyle: { backgroundColor: themeColor.primary500 },
+          tabBarLabelStyle: { color: themeColor.gray500 },
+          tabBarIcon: ({ color }) => (
+            <Ionicons name='ios-time-outline' size={24} color={color} />
+          ),
         }}
       />
-        <BottomTab.Screen
-        name="Store"
+      <BottomTab.Screen
+        name='Store'
         component={StoreScreen}
         options={{
           title: 'Store',
           headerShown: false,
-          tabBarLabelStyle: {color: themeColor.gray500},
-          tabBarIcon: ({ color }) => <Fontisto name="shopping-bag-1" size={24} color={color} />,
+          tabBarLabelStyle: { color: themeColor.gray500 },
+          tabBarIcon: ({ color }) => (
+            <Fontisto name='shopping-bag-1' size={24} color={color} />
+          ),
         }}
       />
       <BottomTab.Screen
-        name="Settings"
+        name='Settings'
         component={SettingsScreen}
         options={{
           title: 'Settings',
           headerShown: false,
-          tabBarLabelStyle: {color: themeColor.gray500},
-          tabBarIcon: ({ color }) => <Ionicons name="ios-settings-outline" size={24} color={color} />,
+          tabBarLabelStyle: { color: themeColor.gray500 },
+          tabBarIcon: ({ color }) => (
+            <Ionicons name='ios-settings-outline' size={24} color={color} />
+          ),
         }}
       />
-
     </BottomTab.Navigator>
   );
 }
@@ -215,7 +267,6 @@ function TabBarIcon(props: {
 }) {
   return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
 }
-
 
 const styles = StyleSheet.create({
   container: {

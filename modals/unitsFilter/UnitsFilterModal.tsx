@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { themeColor, Text, Picker, CheckBox } from 'react-native-rapi-ui';
-import { View } from '../Themed';
+import { View } from '../../components/Themed';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import Slider from '@react-native-community/slider';
 import {
@@ -25,36 +25,7 @@ import {
 
 const { width, height } = Dimensions.get('screen');
 
-const FirstRoute = () => {
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: 'transparent',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <>
-        <Text>filter</Text>
-      </>
-    </View>
-  );
-};
-
-const SecondRoute = () => {
-  return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-      <Text>filter</Text>
-    </View>
-  );
-};
-
-const renderScene = SceneMap({
-  first: FirstRoute,
-  second: SecondRoute,
-});
-
-export default function ModalPage(item: any) {
+export default function UnitsFilterModal(item: any) {
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
 
   const layout = useWindowDimensions();

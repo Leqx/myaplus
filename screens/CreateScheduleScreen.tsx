@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   Alert,
   Dimensions,
@@ -8,7 +8,7 @@ import {
   Switch,
   TouchableOpacity,
   View,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
 import { CalendarList } from 'react-native-calendars';
 import moment from 'moment';
@@ -17,7 +17,7 @@ import * as Localization from 'expo-localization';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import { RootStackParamList } from '../types';
+import { CreateScheduleParams, RootStackParamList } from '../types';
 import useStore from '../store/store';
 import useKeyboardHeight from '../hooks/useKeyboardHeight';
 import {
@@ -29,15 +29,24 @@ import {
   SectionContent,
   useTheme,
   themeColor,
-  TextInput
-} from "react-native-rapi-ui";
+  TextInput,
+} from 'react-native-rapi-ui';
+
+import { NavigatorScreenParams, RouteProp } from '@react-navigation/native';
 
 const { width: vw } = Dimensions.get('window');
 
-export default function CreateSchedule({ navigation,route}: any) {
+export interface CreateScheduleProps {
+  navigation: NavigatorScreenParams<RootStackParamList>;
+  route: RouteProp<RootStackParamList, 'CreateSchedule'>;
+}
 
-  const { updateTodo } = useStore((state: { updateTodo: any; }) => ({
-    updateTodo: state.updateTodo
+const CreateSchedule: React.FC<CreateScheduleParams> = ({
+  navigation,
+  route,
+}: any) => {
+  const { updateTodo } = useStore((state: { updateTodo: any }) => ({
+    updateTodo: state.updateTodo,
   }));
 
   const keyboardHeight = useKeyboardHeight();
@@ -51,8 +60,8 @@ export default function CreateSchedule({ navigation,route}: any) {
       'DD'
     )}`]: {
       selected: true,
-      selectedColor: '#2E66E7'
-    }
+      selectedColor: '#2E66E7',
+    },
   });
   const [currentDay, setCurrentDay] = useState(moment().format());
   const [taskText, setTaskText] = useState('');
@@ -81,18 +90,20 @@ export default function CreateSchedule({ navigation,route}: any) {
     try {
       const createEventId = await addEventsToCalendar(calendarId);
       handleCreateEventData(createEventId);
-    } catch (e) {
-      Alert.alert(e.message);
+    } catch (err) {
+      Alert.alert(`Error ${err}`);
     }
   };
 
-  const addEventsToCalendar = async (calendarId: { toString: () => string; }) => {
+  const addEventsToCalendar = async (calendarId: {
+    toString: () => string;
+  }) => {
     const event = {
       title: taskText,
       notes: notesText,
       startDate: moment(alarmTime).add(0, 'm').toDate(),
       endDate: moment(alarmTime).add(5, 'm').toDate(),
-      timeZone: Localization.timezone
+      timeZone: Localization.timezone,
     };
 
     try {
@@ -124,14 +135,14 @@ export default function CreateSchedule({ navigation,route}: any) {
           alarm: {
             time: alarmTime,
             isOn: isAlarmSet,
-            createEventAsyncRes: createEventId
+            createEventAsyncRes: createEventId,
           },
           color: `rgb(${Math.floor(
             Math.random() * Math.floor(256)
           )},${Math.floor(Math.random() * Math.floor(256))},${Math.floor(
             Math.random() * Math.floor(256)
-          )})`
-        }
+          )})`,
+        },
       ],
       markedDot: {
         date: currentDay,
@@ -139,10 +150,10 @@ export default function CreateSchedule({ navigation,route}: any) {
           {
             key: uuidv4(),
             color: '#2E66E7',
-            selectedDotColor: '#2E66E7'
-          }
-        ]
-      }
+            selectedDotColor: '#2E66E7',
+          },
+        ],
+      },
     };
     navigation.navigate('Schedule');
     await updateTodo(creatTodo);
@@ -153,20 +164,23 @@ export default function CreateSchedule({ navigation,route}: any) {
     const selectedDatePicked = currentDay;
     const hour = moment(date).hour();
     const minute = moment(date).minute();
-    const newModifiedDay = moment(selectedDatePicked).hour(hour).minute(minute);
+    const newModifiedDay = moment(selectedDatePicked)
+      .hour(hour)
+      .minute(minute)
+      .toString();
     setAlarmTime(newModifiedDay);
     hideDateTimePicker();
   };
 
   const { isDarkmode, setTheme } = useTheme();
 
-    return (
+  return (
     <Layout>
       <DateTimePicker
         isVisible={isDateTimePickerVisible}
         onConfirm={handleDatePicked}
         onCancel={hideDateTimePicker}
-        mode="time"
+        mode='time'
         date={new Date()}
         isDarkModeEnabled
       />
@@ -174,23 +188,20 @@ export default function CreateSchedule({ navigation,route}: any) {
       <Section style={styles.container}>
         <Section
           style={{
-            height: visibleHeight
-          }}
-        >
+            height: visibleHeight,
+          }}>
           <ScrollView
             contentContainerStyle={{
-              paddingBottom: 100
-            }}
-          >
+              paddingBottom: 100,
+            }}>
             <View style={styles.backButton}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('Schedule')}
-                style={{ marginRight: vw / 2 - 120, marginLeft: 20 }}
-              >
+                style={{ marginRight: vw / 2 - 120, marginLeft: 20 }}>
                 <Image
                   style={{ height: 25, width: 40 }}
                   source={require('../assets/images/back.png')}
-                  resizeMode="contain"
+                  resizeMode='contain'
                 />
               </TouchableOpacity>
 
@@ -200,9 +211,9 @@ export default function CreateSchedule({ navigation,route}: any) {
               <CalendarList
                 style={{
                   width: 350,
-                  height: 350
+                  height: 350,
                 }}
-                isDarkModeEnable
+                // isDarkModeEnable
                 current={currentDay}
                 minDate={moment().format()}
                 horizontal
@@ -213,41 +224,44 @@ export default function CreateSchedule({ navigation,route}: any) {
                   setSelectedDay({
                     [day.dateString]: {
                       selected: true,
-                      selectedColor: '#2E66E7'
-                    }
+                      selectedColor: '#2E66E7',
+                    },
                   });
                   setCurrentDay(day.dateString);
                   setAlarmTime(day.dateString);
                 }}
-                monthFormat="yyyy MMMM"
+                monthFormat='yyyy MMMM'
                 hideArrows
-                markingType="custom"
+                markingType='custom'
                 theme={{
                   selectedDayBackgroundColor: themeColor.primary,
                   selectedDayTextColor: themeColor.white,
                   todayTextColor: '#2E66E7',
                   backgroundColor: '#eaeef7',
                   calendarBackground: themeColor.gray100,
-                  textDisabledColor: '#d9dbe0'
+                  textDisabledColor: '#d9dbe0',
                 }}
-                markedDates={selectedDay}
+                // markedDates={selectedDay}
               />
             </Section>
             <Section style={styles.taskContainer}>
-              <Text size='lg' style={{ marginBottom: 10, color: themeColor.white, }}>What do you need to study?</Text>
+              <Text
+                size='lg'
+                style={{ marginBottom: 10, color: themeColor.white }}>
+                What do you need to study?
+              </Text>
               <TextInput
                 style={styles.title}
                 onChangeText={setTaskText}
                 value={taskText}
-                placeholder="Enter Unit to study"
+                placeholder='Enter Unit to study'
               />
               <Text
                 size='md'
                 style={{
                   color: '#BDC6D8',
-                  marginVertical: 10
-                }}
-              >
+                  marginVertical: 10,
+                }}>
                 Suggestion
               </Text>
               <View style={{ flexDirection: 'row' }}>
@@ -257,28 +271,26 @@ export default function CreateSchedule({ navigation,route}: any) {
                   </Text>
                 </View>
                 <View style={styles.design}>
-                  <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                    Phy
-                  </Text>
+                  <Text style={{ textAlign: 'center', fontSize: 14 }}>Phy</Text>
                 </View>
                 <View style={styles.learn}>
-                  <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                    Bus
-                  </Text>
+                  <Text style={{ textAlign: 'center', fontSize: 14 }}>Bus</Text>
                 </View>
               </View>
               <View style={styles.notesContent} />
               <Section>
-                <Text size='lg' style={styles.notes}>Additional info</Text>
+                <Text size='lg' style={styles.notes}>
+                  Additional info
+                </Text>
                 <TextInput
                   style={{
                     height: 25,
                     fontSize: 19,
-                    marginTop: 3
+                    marginTop: 3,
                   }}
                   onChangeText={setNotesText}
                   value={notesText}
-                  placeholder="Enter more info about the task."
+                  placeholder='Enter more info about the task.'
                 />
               </Section>
               <View style={styles.separator} />
@@ -287,18 +299,16 @@ export default function CreateSchedule({ navigation,route}: any) {
                   style={{
                     color: '#9CAAC4',
                     fontSize: 16,
-                    fontWeight: '600'
-                  }}
-                >
+                    fontWeight: '600',
+                  }}>
                   Set Times
                 </Text>
                 <TouchableOpacity
                   onPress={() => showDateTimePicker()}
                   style={{
                     height: 25,
-                    marginTop: 3
-                  }}
-                >
+                    marginTop: 3,
+                  }}>
                   <Text style={{ fontSize: 19 }}>
                     {moment(alarmTime).format('h:mm A')}
                   </Text>
@@ -309,25 +319,22 @@ export default function CreateSchedule({ navigation,route}: any) {
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
-              >
+                  alignItems: 'center',
+                }}>
                 <Section>
                   <Text
-                  size='lg'
+                    size='lg'
                     style={{
                       color: '#9CAAC4',
-                      fontWeight: '600'
-                    }}
-                  >
-                      Set Alarm
+                      fontWeight: '600',
+                    }}>
+                    Set Alarm
                   </Text>
                   <View
                     style={{
                       height: 25,
-                      marginTop: 3
-                    }}
-                  >
+                      marginTop: 3,
+                    }}>
                     <Text style={{ fontSize: 19 }}>
                       {moment(alarmTime).format('h:mm A')}
                     </Text>
@@ -342,8 +349,8 @@ export default function CreateSchedule({ navigation,route}: any) {
                 styles.createTaskButton,
                 {
                   backgroundColor:
-                    taskText === '' ? 'rgba(46, 102, 231,0.5)' : '#2E66E7'
-                }
+                    taskText === '' ? 'rgba(46, 102, 231,0.5)' : '#2E66E7',
+                },
               ]}
               onPress={async () => {
                 if (isAlarmSet) {
@@ -352,15 +359,13 @@ export default function CreateSchedule({ navigation,route}: any) {
                 if (!isAlarmSet) {
                   handleCreateEventData('');
                 }
-              }}
-            >
+              }}>
               <Text
-              size='md'
+                size='md'
                 style={{
                   textAlign: 'center',
-                  color: '#fff'
-                }}
-              >
+                  color: '#fff',
+                }}>
                 ADD YOUR TASK
               </Text>
             </TouchableOpacity>
@@ -368,8 +373,10 @@ export default function CreateSchedule({ navigation,route}: any) {
         </Section>
       </Section>
     </Layout>
-    )
-}
+  );
+};
+
+export default CreateSchedule;
 
 const styles = StyleSheet.create({
   createTaskButton: {
@@ -378,34 +385,34 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 40,
     borderRadius: 5,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   separator: {
     height: 0.5,
     width: '100%',
     backgroundColor: '#979797',
     alignSelf: 'center',
-    marginVertical: 20
+    marginVertical: 20,
   },
   notes: {
     color: '#9CAAC4',
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 10
+    marginBottom: 10,
   },
   notesContent: {
     height: 0.5,
     width: '100%',
     backgroundColor: '#979797',
     alignSelf: 'center',
-    marginVertical: 20
+    marginVertical: 20,
   },
   learn: {
     height: 23,
     width: 51,
     backgroundColor: '#F8D557',
     justifyContent: 'center',
-    borderRadius: 5
+    borderRadius: 5,
   },
   design: {
     height: 23,
@@ -413,7 +420,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#62CCFB',
     justifyContent: 'center',
     borderRadius: 5,
-    marginRight: 7
+    marginRight: 7,
   },
   readBook: {
     height: 23,
@@ -421,14 +428,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CD565',
     justifyContent: 'center',
     borderRadius: 5,
-    marginRight: 7
+    marginRight: 7,
   },
   title: {
     height: 25,
     borderColor: '#5DD976',
     borderLeftWidth: 1,
     paddingLeft: 8,
-    fontSize: 19
+    fontSize: 19,
   },
   taskContainer: {
     height: 500,
@@ -439,35 +446,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     shadowOffset: {
       width: 3,
-      height: 3
+      height: 3,
     },
     shadowRadius: 20,
     shadowOpacity: 0.2,
     elevation: 5,
-    padding: 22
+    padding: 22,
   },
   calenderContainer: {
     marginTop: 30,
     width: 350,
     height: 350,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   newTask: {
     alignSelf: 'center',
     fontSize: 20,
     width: 120,
     height: 25,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   backButton: {
     flexDirection: 'row',
     marginTop: 20,
     width: '100%',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   container: {
     flex: 1,
     backgroundColor: '#eaeef7',
-    marginTop: 30
-  }
+    marginTop: 30,
+  },
 });

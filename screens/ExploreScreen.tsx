@@ -124,7 +124,7 @@ export default function ExploreScreen({
   return (
     <Layout>
       <>
-        <ModalPage modalOpen={modalOpen} setModalOpen={setModalOpen} />
+        <ModalPage />
       </>
 
       <SearchHeader>
