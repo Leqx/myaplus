@@ -15,12 +15,10 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "config":{
+      "config": {
         "googleMobileAdsAppId": "ca-app-pub-8894615898933019~7597768930"
       }
     },
@@ -29,12 +27,25 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "config":{
+      "config": {
         "googleMobileAdsAppId": "ca-app-pub-8894615898933019~5039694830"
       }
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": ["sentry-expo"],
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "your sentry organization's short name here",
+            "project": "myaplus",
+            "authToken": "your auth token here"
+          }
+        }
+      ]
     }
   }
 }

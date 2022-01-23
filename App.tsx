@@ -3,6 +3,8 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+// import * as Sentry from 'sentry-expo';
+
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
@@ -15,7 +17,7 @@ import ScheduleState from './context/schedule/ScheduleState';
 
 import { AuthProvider as Auth } from './auth/provider/AuthProvider';
 
-export const App = () => {
+const App = () => {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
 
@@ -37,6 +39,7 @@ export const App = () => {
   }
 };
 
-// export default App;
+export default App;
 
-export { default } from './storybook';
+// Storybook
+// export { default } from './storybook';
