@@ -7,18 +7,15 @@ import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
 
-import { ThemeProvider } from "react-native-rapi-ui";
+import { ThemeProvider } from 'react-native-rapi-ui';
 
 import ScheduleState from './context/schedule/ScheduleState';
-
-import { supabase } from "./initSupabase";
 
 // import {AuthProvider} from './provider/AuthProvider'
 
 import { AuthProvider as Auth } from './auth/provider/AuthProvider';
 
-
-export default function App() {
+export const App = () => {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
 
@@ -26,20 +23,20 @@ export default function App() {
     return null;
   } else {
     return (
-      <ThemeProvider theme="dark">
+      <ThemeProvider theme='dark'>
         <Auth>
-
-       
-      <SafeAreaProvider>
-        <ScheduleState>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
-        </ScheduleState>
-      </SafeAreaProvider>
-       
-
+          <SafeAreaProvider>
+            <ScheduleState>
+              <Navigation colorScheme={colorScheme} />
+              <StatusBar />
+            </ScheduleState>
+          </SafeAreaProvider>
         </Auth>
       </ThemeProvider>
     );
   }
-}
+};
+
+// export default App;
+
+export { default } from './storybook';
