@@ -31,7 +31,7 @@ import Task from '../components/task/Task';
 import CalendarStrip from 'react-native-calendar-strip';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { RootTabScreenProps } from '../types';
-import useStore from '../store/store';
+import useStore from '../store/schedule/store';
 
 const datesWhitelist = [
   {

@@ -26,6 +26,10 @@ import { Ionicons } from '@expo/vector-icons';
 
 import ProductCard from '../components/productCard/ProductCard';
 import SpecialOfferSlider from '../components/specialOfferSlider/SpecialOfferSlider';
+import CarPoolModal from '../modals/carPool/CarPoolModal';
+import CartModal from '../modals/cart/CartModal';
+import ProductFilterModal from '../modals/productFilter/ProductFilterModal';
+import { useProductStore } from '../store/product/productStore';
 
 const SLIDER_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
@@ -38,10 +42,10 @@ const RADIUS = (1.5 * width) / 2;
 
 const actions = [
   {
-    text: 'Car Pool with friends',
-    icon: require('../assets/images/box.png'),
-    name: 'bt_orders',
-    position: 2,
+    text: 'Filter',
+    icon: require('../assets/images/shopping-cart.png'),
+    name: 'bt_filter',
+    position: 4,
     buttonSize: 55,
     textBackground: '#262834',
     textColor: '#3366FF',
@@ -58,20 +62,20 @@ const actions = [
     textStyle: { fontSize: 15 },
   },
   {
-    text: 'Print or Photocopy',
-    icon: require('../assets/images/shopping-cart.png'),
-    name: 'bt_print',
-    position: 1,
+    text: 'Car Pool with friends',
+    icon: require('../assets/images/box.png'),
+    name: 'bt_orders',
+    position: 2,
     buttonSize: 55,
     textBackground: '#262834',
     textColor: '#3366FF',
     textStyle: { fontSize: 15 },
   },
   {
-    text: 'Filter',
+    text: 'Print',
     icon: require('../assets/images/shopping-cart.png'),
-    name: 'bt_filter',
-    position: 4,
+    name: 'bt_print',
+    position: 1,
     buttonSize: 55,
     textBackground: '#262834',
     textColor: '#3366FF',
@@ -82,6 +86,8 @@ const actions = [
 export default function StoreScreen() {
   const { isDarkmode, setTheme } = useTheme();
 
+  const products = useProductStore((state) => state.products);
+
   const [bannerAdId, setBannerAdId] = React.useState<string>(
     Platform.OS === 'ios'
       ? 'ca-app-pub-3940256099942544/2934735716'
@@ -90,36 +96,85 @@ export default function StoreScreen() {
 
   const [productData, setProductData] = React.useState([
     {
+      id: '1',
       name: 'pencil',
-      desc: 'this is a desc',
+      description: 'this is a description',
       category: 'pencil',
+      img: 'https://via.placeholder.com/300/09f/fff.png',
       price: 20,
+      amount: 1,
+      available: true,
+      discount: 10,
     },
     {
+      id: '2',
       name: 'book',
-      desc: 'this is a desc',
+      description: 'this is a description',
       category: 'book',
+      img: 'https://via.placeholder.com/300/09f/fff.png',
       price: 30,
+      amount: 1,
+      available: true,
+      discount: 10,
     },
     {
+      id: '3',
       name: 'pen',
-      desc: 'this is a desc',
+      description: 'this is a description',
       category: 'pen',
+      img: 'https://via.placeholder.com/300/09f/fff.png',
       price: 25,
+      amount: 1,
+      available: true,
+      discount: 10,
     },
     {
+      id: '4',
       name: 'set',
-      desc: 'this is a desc',
+      description: 'this is a description',
       category: 'set',
+      img: 'https://via.placeholder.com/300/09f/fff.png',
       price: 100,
+      amount: 1,
+      available: true,
+      discount: 10,
     },
   ]);
+
+  const [modalOpenCarPool, setModalOpenCarPool] =
+    React.useState<boolean>(false);
+  const [modalOpenCart, setModalOpenCart] = React.useState<boolean>(false);
+  const [modalOpenFilter, setModalOpenFilter] = React.useState<boolean>(false);
+  // const [modalOpenPrint, setModalOpenPrint] = React.useState<boolean>(false);
 
   return (
     <Layout>
       <>
         <SpecialOfferSlider />
       </>
+
+      <>
+        {/** Car Pool */}
+        <CarPoolModal
+          modalOpen={modalOpenCarPool}
+          setModalOpen={setModalOpenCarPool}
+        />
+      </>
+
+      <>
+        {/** Cart */}
+        <CartModal modalOpen={modalOpenCart} setModalOpen={setModalOpenCart} />
+      </>
+
+      <>
+        {/** Filter */}
+        <ProductFilterModal
+          modalOpen={modalOpenFilter}
+          setModalOpen={setModalOpenFilter}
+        />
+      </>
+
+      <>{/** Print */}</>
 
       <Section style={styles.header}>
         <AdMobBanner
@@ -143,7 +198,7 @@ export default function StoreScreen() {
           }}
           removeClippedSubviews={false}
           renderItem={({ item }) => <ProductCard {...item} />}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item) => item.id}
         />
       </Section>
 
@@ -158,7 +213,24 @@ export default function StoreScreen() {
           distanceToEdge={20}
           position='left'
           onPressItem={(name) => {
-            console.log(`selected button: ${name}`);
+            if (name === 'bt_cart') {
+              setModalOpenCart(true);
+              console.log(`selected button: ${name}`);
+            }
+
+            if (name === 'bt_orders') {
+              setModalOpenCarPool(true);
+              console.log(`selected button: ${name}`);
+            }
+
+            if (name === 'bt_print') {
+              console.log(`selected button: ${name}`);
+            }
+
+            if (name === 'bt_filter') {
+              setModalOpenFilter(true);
+              console.log(`selected button: ${name}`);
+            }
           }}
         />
       </View>

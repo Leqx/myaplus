@@ -5647,10 +5647,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-native@~0.63.2":
-  version "0.63.53"
-  resolved "https://registry.npmjs.org/@types/react-native/-/react-native-0.63.53.tgz"
-  integrity sha512-hfUYHlfuy436viNct5uYNh2y40iWl1+iWhAQ18vzoKtyeW4WLNyccZf6OfkJdkqkHyH+bgvHLhbmnocpnQeKXg==
+"@types/react-native@^0.66.15":
+  version "0.66.15"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.66.15.tgz#d332d82b04635adabbd8e1976f9547ce8662300b"
+  integrity sha512-qNK3LZhNpSd2Hdr0OFdvQ/VOb1qcjNhmw96LsOtxIN+1RtXHO/1dVzxYUlWnKMCtV+E5WSaWM703c9Q7gG9tyg==
   dependencies:
     "@types/react" "*"
 
@@ -6501,6 +6501,11 @@ attempt-x@^1.1.0, attempt-x@^1.1.1:
   version "1.1.3"
   resolved "https://registry.npmjs.org/attempt-x/-/attempt-x-1.1.3.tgz"
   integrity sha512-y/+ek8IjxVpTbj/phC87jK5YRhlP5Uu7FlQdCmYuut1DTjNruyrGqUWi5bcX1VKsQX1B0FX16A1hqHomKpHv3A==
+
+auto-zustand-selectors-hook@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/auto-zustand-selectors-hook/-/auto-zustand-selectors-hook-1.0.1.tgz#5198809dd715b4a56f0cdc8cb2610c2cd6c5ced1"
+  integrity sha512-jU60PBB4L3nqor10flUBfkqmIGcWk8Gyw/MT5xVLTssfAMTZh4i4UaoVCszLVVXIGVyPFxc4SNpM+iU/rJkDFw==
 
 autoprefixer@^9.7.2:
   version "9.8.8"
@@ -9440,6 +9445,14 @@ expo-localization@~10.2.0:
   integrity sha512-fe72BnW3jGmgIqyfYoGAmG3o83+DJ6pQotsuIGzo+ZasqBw0ho6TPWRS64B0nt+8ZSLzJ9n1WxInH+Z8zYzb7w==
   dependencies:
     rtl-detect "^1.0.2"
+
+expo-location@~12.1.2:
+  version "12.1.3"
+  resolved "https://registry.yarnpkg.com/expo-location/-/expo-location-12.1.3.tgz#307963d02e017f1d217fdee2656b2944850540f5"
+  integrity sha512-Sm/p79Ska4Ie8V2sG5eYECi1000nIm1wirxi/3yErVfZXsxE2KdEmlIN8kVCPqTDskYTol60hVKp/P2teNkyPA==
+  dependencies:
+    "@expo/config-plugins" "^3.0.0"
+    expo-modules-core "~0.2.0"
 
 expo-modules-autolinking@^0.0.3:
   version "0.0.3"

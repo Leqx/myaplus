@@ -25,8 +25,16 @@ import {
 
 const { width, height } = Dimensions.get('screen');
 
-export default function UnitsFilterModal(item: any) {
-  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+type ModalProps = {
+  modalOpen: boolean;
+  setModalOpen: (value: boolean) => void;
+};
+
+export default function UnitsFilterModal({
+  modalOpen,
+  setModalOpen,
+}: ModalProps): any {
+  // const [modalOpen, setModalOpen] = React.useState<boolean>(false);
 
   const layout = useWindowDimensions();
 

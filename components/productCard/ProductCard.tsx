@@ -10,18 +10,25 @@ import {
 } from 'react-native-rapi-ui';
 import { View } from '../../components/Themed';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useProductStore } from '../../store/product/productStore';
 const { width } = Dimensions.get('screen');
 
 const image = { uri: 'https://via.placeholder.com/300/09f/fff.png' };
 
 type Item = {
+  id: string;
   name: string;
-  desc: string;
+  description: string;
+  img: string;
   category: string;
   price: number;
+  amount: number;
+  available: boolean;
+  discount: number;
 };
 
 export default function ProductCard(item: Item) {
+  const addToCart = useProductStore((state) => state.addToCart);
   return (
     <>
       <SectionContent style={styles.slider}>
@@ -54,6 +61,7 @@ export default function ProductCard(item: Item) {
             status='primary'
             type='TouchableOpacity'
             size='md'
+            onPress={() => addToCart(item)}
           />
         </Section>
       </SectionContent>

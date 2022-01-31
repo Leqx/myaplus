@@ -18,7 +18,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateScheduleParams, RootStackParamList } from '../types';
-import useStore from '../store/store';
+import useStore from '../store/schedule/store';
 import useKeyboardHeight from '../hooks/useKeyboardHeight';
 import {
   Layout,

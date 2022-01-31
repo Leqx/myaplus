@@ -45,6 +45,7 @@ import { unitsRef } from '../initFirebase';
 import { useContext } from 'react';
 import SearchHeader from '../components/searchHeader/SearchHeader';
 import ModalPage from '../components/modal/ModalPage';
+import UnitsFilterModal from '../modals/unitsFilter/UnitsFilterModal';
 
 const { width } = Dimensions.get('screen');
 
@@ -124,7 +125,7 @@ export default function ExploreScreen({
   return (
     <Layout>
       <>
-        <ModalPage />
+        <UnitsFilterModal modalOpen={modalOpen} setModalOpen={setModalOpen} />
       </>
 
       <SearchHeader>

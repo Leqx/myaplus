@@ -17,6 +17,8 @@ import ScheduleState from './context/schedule/ScheduleState';
 
 import { AuthProvider as Auth } from './auth/provider/AuthProvider';
 
+// TODO: Remove all unused packages
+
 const App = () => {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();

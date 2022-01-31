@@ -22,11 +22,24 @@ import {
   Cols,
   Cell,
 } from 'react-native-table-component';
+import { useProductStore } from '../../store/product/productStore';
 
 const { width, height } = Dimensions.get('screen');
 
-export default function ProductFilterModal(item: any) {
-  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+type ModalProps = {
+  modalOpen: boolean;
+  setModalOpen: (value: boolean) => void;
+};
+
+export default function ProductFilterModal({
+  modalOpen,
+  setModalOpen,
+}: ModalProps): any {
+  // const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+
+  const sortByPrice = useProductStore((state) => state.sortByPrice);
+  const clearFilters = useProductStore((state) => state.clearFilters);
+  const filterByStock = useProductStore((state) => state.filterByStock);
 
   const layout = useWindowDimensions();
 
@@ -82,7 +95,7 @@ export default function ProductFilterModal(item: any) {
               <Picker
                 items={items}
                 value={pickerValue}
-                placeholder='Select a Subject'
+                placeholder='Select a Category'
                 onValueChange={(val) => setPickerValue(val)}
               />
             </>
@@ -127,9 +140,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   close: {
-    paddingTop: 10,
+    paddingTop: 20,
     flex: 0.05,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     backgroundColor: 'transparent',
   },
   tabs: {
