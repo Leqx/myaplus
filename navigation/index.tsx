@@ -71,17 +71,18 @@ export default function Navigation({
   const { isDarkmode, setTheme } = useTheme();
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      console.log('user status changed:', user);
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
+      //  console.log('user status changed:', user);
       setLoading(false);
     });
 
     return () => {
-      console.log('unsub');
+      unsubAuth();
+      // console.log('unsub');
     };
   }, [user]);
 
-  console.log(user);
+  // console.log(user);
 
   return (
     <NavigationContainer

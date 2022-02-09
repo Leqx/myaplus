@@ -149,32 +149,39 @@ export default function StoreScreen() {
 
   return (
     <Layout>
+      {/*
       <>
         <SpecialOfferSlider />
       </>
+      */}
 
+      {/*
       <>
-        {/** Car Pool */}
         <CarPoolModal
           modalOpen={modalOpenCarPool}
           setModalOpen={setModalOpenCarPool}
         />
       </>
+      */}
 
+      {/*
       <>
-        {/** Cart */}
         <CartModal modalOpen={modalOpenCart} setModalOpen={setModalOpenCart} />
       </>
+      */}
 
-      <>
-        {/** Filter */}
+      {/*
+       <>
         <ProductFilterModal
           modalOpen={modalOpenFilter}
           setModalOpen={setModalOpenFilter}
         />
       </>
-
-      <>{/** Print */}</>
+      */}
+      <Section
+        style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={styles.title}>Under Construction</Text>
+      </Section>
 
       <Section style={styles.header}>
         <AdMobBanner
@@ -185,7 +192,8 @@ export default function StoreScreen() {
         />
       </Section>
 
-      <Section style={styles.productHeader}>
+      {/*
+       <Section style={styles.productHeader}>
         <FlatList
           data={productData}
           horizontal
@@ -201,8 +209,10 @@ export default function StoreScreen() {
           keyExtractor={(item) => item.id}
         />
       </Section>
+       */}
 
-      <View style={styles.fab}>
+      {/*
+       <View style={styles.fab}>
         <FloatingAction
           actions={actions}
           showBackground={true}
@@ -234,6 +244,7 @@ export default function StoreScreen() {
           }}
         />
       </View>
+       */}
     </Layout>
   );
 }
@@ -271,14 +282,14 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   header: {
-    flex: 0.5,
+    flex: 1,
     width: width,
     backgroundColor: themeColor.white,
     borderBottomRightRadius: 0,
     borderBottomLeftRadius: 0,
     borderTopRightRadius: 0,
     borderTopLeftRadius: 0,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 20,
   },
