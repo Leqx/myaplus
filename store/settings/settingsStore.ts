@@ -21,12 +21,33 @@ export interface TSettingsState {
   upgradeToPremium: () => void;
 }
 
-const immer =
-  <T extends State>(
-    config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
-  ): StateCreator<T> =>
-  (set, get, api) =>
-    config((fn) => set(produce<T>(fn)), get, api);
+// const immer =
+//   <T extends State>(
+//     config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
+//   ): StateCreator<T> =>
+//   (set, get, api) =>
+//     config((fn) => set(produce<T>(fn)), get, api);
+
+export const immer =
+  (config: {
+    (set: SettingsStoreSet): {
+      useSettings: {};
+      getNotifications: () => void;
+      enableNotifications: () => void;
+      disableNotifications: () => void;
+      setDarkMode: () => void;
+      setLightMode: () => void;
+      changeTheme: () => void;
+      removeAds: () => void;
+      upgradeToPremium: () => void;
+    };
+    (arg0: (fn: any) => any, arg1: any): any;
+  }) =>
+  (
+    set: (arg0: (base: unknown, ...args: unknown[]) => unknown) => any,
+    get: any
+  ) =>
+    config((fn: any) => set(produce(fn)), get);
 
 type SettingsStoreSet = (
   fn: (draft: WritableDraft<TSettingsState>) => void

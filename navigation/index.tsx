@@ -58,6 +58,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 
 import { Ionicons } from '@expo/vector-icons';
 
+import { useScheduleStore } from '../store/schedule/scheduleStore';
+
 export default function Navigation({
   colorScheme,
 }: {
@@ -178,6 +180,11 @@ const BottomTab = createBottomTabNavigator<RootTabParamList>();
 function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
+  const todos = useScheduleStore((state) => state.todos);
+
+  let scheduledTodos = todos.filter((todo) => todo.isScheduled == true);
+  let numberOfScheduledTodos = scheduledTodos.length;
+  //  console.log(numberOfScheduledTodos);
   return (
     <BottomTab.Navigator
       initialRouteName='Explore'
@@ -223,7 +230,7 @@ function BottomTabNavigator() {
         options={{
           title: 'Schedule',
           headerShown: false,
-          tabBarBadge: 3,
+          tabBarBadge: numberOfScheduledTodos,
           tabBarBadgeStyle: { backgroundColor: themeColor.primary500 },
           tabBarLabelStyle: { color: themeColor.gray500 },
           tabBarIcon: ({ color }) => (

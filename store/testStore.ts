@@ -60,3 +60,6 @@ const store = (set: StoreSet) => ({
 export const useStore = createSelectorHooks(
   create<PageState>(devtools(immer(store)))
 );
+
+// export const immer = (config) => (set, get) =>
+//   config((fn) => set(produce(fn)), get);

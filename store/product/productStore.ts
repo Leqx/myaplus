@@ -18,15 +18,15 @@ export interface IProduct {
 
 // type IProductMap = Map<string, IProduct>;
 
-// export interface TProductInCart {
-//   id: string;
-//   name: string;
-//   img: string;
-//   price: number;
-//   category: string;
-//   discount: number;
-//   amount: number;
-// }
+export interface IProductInCart {
+  id: string;
+  name: string;
+  img: string;
+  price: number;
+  category: string;
+  discount: number;
+  amount: number;
+}
 
 // export interface ICart {
 //   product: TProductInCart;
@@ -34,25 +34,48 @@ export interface IProduct {
 // }
 
 export interface TProductState {
-  products: object[];
+  products: Array<IProduct>;
   getProducts: () => void;
-  cart: object[];
+  cart: Array<IProductInCart>;
   addToCart: (product: IProduct) => void;
-  removeFromCart: (id: number) => void;
+  removeFromCart: (id: string) => void;
   clearCart: () => void;
-  changeQty: (id: number, amount: number) => void;
+  changeQty: (id: string, amount: number) => void;
   sortByPrice: () => void;
   filterByStock: () => void;
   filterBySearch: () => void;
   clearFilters: () => void;
 }
 
-const immer =
-  <T extends State>(
-    config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
-  ): StateCreator<T> =>
-  (set, get, api) =>
-    config((fn) => set(produce<T>(fn)), get, api);
+// const immer =
+//   <T extends State>(
+//     config: StateCreator<T, (fn: (draft: Draft<T>) => void) => void>
+//   ): StateCreator<T> =>
+//   (set, get, api) =>
+//     config((fn) => set(produce<T>(fn)), get, api);
+
+export const immer =
+  (config: {
+    (set: ProductStoreSet): {
+      products: {}[];
+      getProducts: () => void;
+      cart: {}[];
+      addToCart: (product: IProduct) => void;
+      removeFromCart: (id: string) => void;
+      clearCart: () => void;
+      changeQty: (id: string, amount: number) => void;
+      sortByPrice: () => void;
+      filterByStock: () => void;
+      filterBySearch: () => void;
+      clearFilters: () => void;
+    };
+    (arg0: (fn: any) => any, arg1: any): any;
+  }) =>
+  (
+    set: (arg0: (base: unknown, ...args: unknown[]) => unknown) => any,
+    get: any
+  ) =>
+    config((fn: any) => set(produce(fn)), get);
 
 type ProductStoreSet = (
   fn: (draft: WritableDraft<TProductState>) => void
@@ -67,20 +90,21 @@ const productStore = (set: ProductStoreSet) => ({
   cart: [{}],
   addToCart: (product: IProduct) =>
     set((state) => {
-      //  cart: [product];
+      state.cart.push(product);
       console.log(`added to cart${product.name}`);
     }),
-  removeFromCart: (id: number) =>
+  removeFromCart: (id: string) =>
     set((state) => {
-      console.log('removed from cart');
+      state.cart.filter((x) => x.id !== id);
     }),
   clearCart: () =>
     set((state) => {
       console.log('cart cleared');
     }),
-  changeQty: (id: number, amount: number) =>
+  changeQty: (id: string, amount: number) =>
     set((state) => {
-      console.log('changed amount');
+      const cartItem = state.cart.find((x) => x.id === id);
+      if (!cartItem) return;
     }),
   sortByPrice: () =>
     set((state) => {

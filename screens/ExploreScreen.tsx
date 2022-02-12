@@ -36,7 +36,7 @@ import SearchBar from '../components/search/SearchBar';
 import SearchFilter from '../components/search/SearchFilter';
 import UnitsCard from '../components/unitsCard/UnitsCard';
 import UnitsContext from '../context/units/units-context';
-import UnitsSlider from '../components/unitsSlider/UnitsSlider';
+
 import { View } from '../components/Themed';
 import { getDocs } from 'firebase/firestore';
 import scheduleReducer from '../context/schedule/schedule-reducer';
