@@ -35,6 +35,13 @@ import {
 import { NavigatorScreenParams, RouteProp } from '@react-navigation/native';
 import { useScheduleStore } from '../store/schedule/scheduleStore';
 import { Picker } from '@react-native-picker/picker';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object().shape({
+  selectedUnit: Yup.string().trim(),
+  additionalInfo: Yup.string().trim().min(2, 'Is too short '),
+});
 
 const { width: vw } = Dimensions.get('window');
 
@@ -177,8 +184,8 @@ const CreateSchedule: React.FC<CreateScheduleParams> = ({
   const { isDarkmode, setTheme } = useTheme();
 
   const todos = useScheduleStore((state) => state.todos);
-  let titles = todos.map((x) => x.title);
-  let ids = todos.map((x) => x.id);
+
+  const initialValues = { selectedUnit: '', additionalInfo: '', time: '' };
 
   const [selectedUnit, setSelectedUnit] = useState('');
 
@@ -198,203 +205,258 @@ const CreateSchedule: React.FC<CreateScheduleParams> = ({
           style={{
             height: visibleHeight,
           }}>
-          <ScrollView
-            contentContainerStyle={{
-              paddingBottom: 100,
-            }}>
-            <View style={styles.backButton}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Schedule')}
-                style={{ marginRight: vw / 2 - 120, marginLeft: 20 }}>
-                <Image
-                  style={{ height: 25, width: 40 }}
-                  source={require('../assets/images/back.png')}
-                  resizeMode='contain'
-                />
-              </TouchableOpacity>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            // TODO: work on submission
+            onSubmit={({ selectedUnit, additionalInfo, time }) =>
+              console.log(selectedUnit, additionalInfo, time)
+            }>
+            {({
+              values,
 
-              <Text style={styles.newTask}>Create Task</Text>
-            </View>
-            <Section style={styles.calenderContainer}>
-              <CalendarList
-                style={{
-                  width: 350,
-                  height: 350,
-                }}
-                // isDarkModeEnable
-                current={currentDay}
-                minDate={moment().format()}
-                horizontal
-                pastScrollRange={0}
-                pagingEnabled
-                calendarWidth={350}
-                onDayPress={(day) => {
-                  setSelectedDay({
-                    [day.dateString]: {
-                      selected: true,
-                      selectedColor: '#2E66E7',
-                    },
-                  });
-                  setCurrentDay(day.dateString);
-                  setAlarmTime(day.dateString);
-                }}
-                monthFormat='yyyy MMMM'
-                hideArrows
-                markingType='custom'
-                theme={{
-                  selectedDayBackgroundColor: themeColor.primary,
-                  selectedDayTextColor: themeColor.white,
-                  todayTextColor: '#2E66E7',
-                  backgroundColor: '#eaeef7',
-                  calendarBackground: themeColor.gray100,
-                  textDisabledColor: '#d9dbe0',
-                }}
-                // markedDates={selectedDay}
-              />
-            </Section>
-            <Section style={styles.taskContainer}>
-              <Text size='lg' style={{ marginBottom: 10, color: '#9CAAC4' }}>
-                Select what to study
-              </Text>
+              errors,
 
-              <Picker
-                mode='dialog'
-                style={{ color: 'white', paddingVertical: 20 }}
-                dropdownIconColor={themeColor.primary}
-                selectedValue={selectedUnit}
-                onValueChange={(itemValue, itemIndex) =>
-                  setSelectedUnit(itemValue)
-                }>
-                {todos.map((todo) => (
-                  <Picker.Item
-                    key={todo.id}
-                    label={todo.title}
-                    value={todo.title.toLocaleLowerCase()}
-                  />
-                ))}
-              </Picker>
+              touched,
 
-              {/* <TextInput
+              handleChange,
+
+              handleBlur,
+
+              handleSubmit,
+
+              isSubmitting,
+
+              isValid,
+
+              setFieldValue,
+            }) => {
+              return (
+                <ScrollView
+                  contentContainerStyle={{
+                    paddingBottom: 100,
+                  }}>
+                  <View style={styles.backButton}>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('Schedule')}
+                      style={{ marginRight: vw / 2 - 120, marginLeft: 20 }}>
+                      <Image
+                        style={{ height: 25, width: 40 }}
+                        source={require('../assets/images/back.png')}
+                        resizeMode='contain'
+                      />
+                    </TouchableOpacity>
+
+                    <Text style={styles.newTask}>Create Task</Text>
+                  </View>
+                  <Section style={styles.calenderContainer}>
+                    <CalendarList
+                      style={{
+                        width: 350,
+                        height: 350,
+                      }}
+                      // isDarkModeEnable
+                      current={currentDay}
+                      minDate={moment().format()}
+                      horizontal
+                      pastScrollRange={0}
+                      pagingEnabled
+                      calendarWidth={350}
+                      onDayPress={(day) => {
+                        setSelectedDay({
+                          [day.dateString]: {
+                            selected: true,
+                            selectedColor: '#2E66E7',
+                          },
+                        });
+                        setCurrentDay(day.dateString);
+                        setAlarmTime(day.dateString);
+                      }}
+                      monthFormat='yyyy MMMM'
+                      hideArrows
+                      markingType='custom'
+                      theme={{
+                        selectedDayBackgroundColor: themeColor.primary,
+                        selectedDayTextColor: themeColor.white,
+                        todayTextColor: '#2E66E7',
+                        backgroundColor: '#eaeef7',
+                        calendarBackground: themeColor.gray100,
+                        textDisabledColor: '#d9dbe0',
+                      }}
+                      // markedDates={selectedDay}
+                    />
+                  </Section>
+                  <Section style={styles.taskContainer}>
+                    <Text
+                      size='lg'
+                      style={{ marginBottom: 10, color: '#9CAAC4' }}>
+                      Select what to study
+                    </Text>
+
+                    <Picker
+                      mode='dialog'
+                      style={{ color: 'white', paddingVertical: 20 }}
+                      dropdownIconColor={themeColor.primary}
+                      selectedValue={selectedUnit}
+                      // TODO: handle with formik
+                      onValueChange={(val) =>
+                        setFieldValue('selectedUnit', val)
+                      }
+                      // onValueChange={(itemValue, itemIndex) =>
+                      //   setSelectedUnit(itemValue)
+                      // }
+                    >
+                      {todos.map((todo) => (
+                        <Picker.Item
+                          key={todo.id}
+                          label={todo.title}
+                          value={todo.title.toLocaleLowerCase()}
+                        />
+                      ))}
+                    </Picker>
+
+                    {/* <TextInput
                 style={styles.title}
                 onChangeText={setTaskText}
                 value={taskText}
                 placeholder='Enter Unit to study'
               /> */}
-              <Text
-                size='sm'
-                style={{
-                  color: '#BDC6D8',
-                  marginVertical: 10,
-                }}>
-                Suggestion
-              </Text>
-              <View style={{ flexDirection: 'row' }}>
-                <View style={styles.readBook}>
-                  <Text style={{ textAlign: 'center', fontSize: 12 }}>
-                    Math
-                  </Text>
-                </View>
-                <View style={styles.design}>
-                  <Text style={{ textAlign: 'center', fontSize: 12 }}>Phy</Text>
-                </View>
-                <View style={styles.learn}>
-                  <Text style={{ textAlign: 'center', fontSize: 12 }}>Bus</Text>
-                </View>
-              </View>
-              <View style={styles.notesContent} />
-              <Section>
-                <Text size='lg' style={styles.notes}>
-                  Additional info
-                </Text>
-                <TextInput
-                  style={{
-                    height: 25,
-                    fontSize: 19,
-                    marginTop: 3,
-                  }}
-                  onChangeText={setNotesText}
-                  value={notesText}
-                  placeholder='Enter more info about the task.'
-                />
-              </Section>
-              <View style={styles.separator} />
-              <Section>
-                <Text
-                  style={{
-                    color: '#9CAAC4',
-                    fontSize: 16,
-                    fontWeight: '600',
-                  }}>
-                  Set Times
-                </Text>
-                <TouchableOpacity
-                  onPress={() => showDateTimePicker()}
-                  style={{
-                    height: 25,
-                    marginTop: 3,
-                  }}>
-                  <Text style={{ fontSize: 19 }}>
-                    {moment(alarmTime).format('h:mm A')}
-                  </Text>
-                </TouchableOpacity>
-              </Section>
-              <View style={styles.separator} />
-              <Section
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Section>
-                  <Text
-                    size='lg'
-                    style={{
-                      color: '#9CAAC4',
-                      fontWeight: '600',
-                    }}>
-                    Set Alarm
-                  </Text>
-                  <View
-                    style={{
-                      height: 25,
-                      marginTop: 3,
-                    }}>
-                    <Text style={{ fontSize: 19 }}>
-                      {moment(alarmTime).format('h:mm A')}
+                    <Text
+                      size='sm'
+                      style={{
+                        color: '#BDC6D8',
+                        marginVertical: 10,
+                      }}>
+                      Suggestion
                     </Text>
-                  </View>
-                </Section>
-                <Switch value={isAlarmSet} onValueChange={handleAlarmSet} />
-              </Section>
-            </Section>
-            <TouchableOpacity
-              disabled={taskText === ''}
-              style={[
-                styles.createTaskButton,
-                {
-                  backgroundColor:
-                    taskText === '' ? 'rgba(46, 102, 231,0.5)' : '#2E66E7',
-                },
-              ]}
-              onPress={async () => {
-                if (isAlarmSet) {
-                  await synchronizeCalendar();
-                }
-                if (!isAlarmSet) {
-                  // TODO: PASS IN DATA
-                  handleCreateEventData('');
-                }
-              }}>
-              <Text
-                size='md'
-                style={{
-                  textAlign: 'center',
-                  color: '#fff',
-                }}>
-                ADD YOUR TASK
-              </Text>
-            </TouchableOpacity>
-          </ScrollView>
+                    <View style={{ flexDirection: 'row' }}>
+                      <View style={styles.readBook}>
+                        <Text style={{ textAlign: 'center', fontSize: 12 }}>
+                          Math
+                        </Text>
+                      </View>
+                      <View style={styles.design}>
+                        <Text style={{ textAlign: 'center', fontSize: 12 }}>
+                          Phy
+                        </Text>
+                      </View>
+                      <View style={styles.learn}>
+                        <Text style={{ textAlign: 'center', fontSize: 12 }}>
+                          Bus
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.notesContent} />
+                    <Section>
+                      <Text size='lg' style={styles.notes}>
+                        Additional info
+                      </Text>
+                      <TextInput
+                        style={{
+                          height: 25,
+                          fontSize: 19,
+                          marginTop: 3,
+                        }}
+                        value={values.additionalInfo}
+                        //  value={notesText}
+                        onChangeText={handleChange('additionalInfo')}
+                        onBlur={handleBlur('additionalInfo')}
+                        // onChangeText={setNotesText}
+                        placeholder='Enter more info about the task.'
+                        enablesReturnKeyAutomatically={true}
+                        borderColor={
+                          touched.additionalInfo && errors.additionalInfo
+                            ? themeColor.danger
+                            : themeColor.primaryTransparent100
+                        }
+                      />
+                    </Section>
+                    <View style={styles.separator} />
+                    <Section>
+                      <Text
+                        style={{
+                          color: '#9CAAC4',
+                          fontSize: 16,
+                          fontWeight: '600',
+                        }}>
+                        Set Times
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => showDateTimePicker()}
+                        style={{
+                          height: 25,
+                          marginTop: 3,
+                        }}>
+                        <Text style={{ fontSize: 19 }}>
+                          {moment(alarmTime).format('h:mm A')}
+                        </Text>
+                      </TouchableOpacity>
+                    </Section>
+                    <View style={styles.separator} />
+                    <Section
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Section>
+                        <Text
+                          size='lg'
+                          style={{
+                            color: '#9CAAC4',
+                            fontWeight: '600',
+                          }}>
+                          Set Alarm
+                        </Text>
+                        <View
+                          style={{
+                            height: 25,
+                            marginTop: 3,
+                          }}>
+                          <Text style={{ fontSize: 19 }}>
+                            {moment(alarmTime).format('h:mm A')}
+                          </Text>
+                        </View>
+                      </Section>
+                      <Switch
+                        value={isAlarmSet}
+                        onValueChange={handleAlarmSet}
+                      />
+                    </Section>
+                  </Section>
+                  <TouchableOpacity
+                    disabled={taskText === ''}
+                    style={[
+                      styles.createTaskButton,
+                      {
+                        backgroundColor:
+                          taskText === ''
+                            ? 'rgba(46, 102, 231,0.5)'
+                            : '#2E66E7',
+                      },
+                    ]}
+                    onPress={async () => {
+                      if (isAlarmSet) {
+                        await synchronizeCalendar();
+                      }
+                      if (!isAlarmSet) {
+                        // TODO: PASS IN DATA & handle formik submit
+                        handleCreateEventData('');
+                      }
+                    }}>
+                    <Text
+                      size='md'
+                      style={{
+                        textAlign: 'center',
+                        color: '#fff',
+                      }}>
+                      ADD YOUR TASK
+                    </Text>
+                  </TouchableOpacity>
+                </ScrollView>
+              );
+            }}
+          </Formik>
         </Section>
       </Section>
     </Layout>
