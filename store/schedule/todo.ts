@@ -1,31 +1,28 @@
 const TODO = [
   {
-    id: '01',
-    category: 'Business',
+    id: '001',
     title: 'Accounting',
-    description: '',
+    additionalInfo: '',
+    day: '',
     time: '',
-    inMyList: false,
     isScheduled: true,
     isCompleted: false,
   },
   {
-    id: '02',
-    category: 'Business',
+    id: '002',
     title: 'Microeconomics',
-    description: '',
+    additionalInfo: '',
+    day: '',
     time: '',
-    inMyList: false,
     isScheduled: true,
     isCompleted: false,
   },
   {
-    id: '03',
-    category: 'Business',
+    id: '003',
     title: 'Business Finance',
-    description: '',
+    additionalInfo: '',
+    day: '',
     time: '',
-    inMyList: false,
     isScheduled: false,
     isCompleted: false,
   },
@@ -33,36 +30,24 @@ const TODO = [
 
 export interface ITodo {
   id: string;
-  category: string;
   title: string;
-  description: string;
+  additionalInfo: string;
+  day: string;
   time: string;
-  inMyList: boolean;
   isScheduled: boolean;
   isCompleted: boolean;
-  index: number;
 }
 
 export const TODOS: ITodo[] = TODO.map(
   (
-    {
-      id,
-      category,
-      title,
-      description,
-      time,
-      inMyList,
-      isScheduled,
-      isCompleted,
-    },
+    { id, title, additionalInfo, day, time, isScheduled, isCompleted },
     index
   ) => ({
     id,
-    category,
     title,
-    description,
+    additionalInfo,
+    day,
     time,
-    inMyList,
     isScheduled,
     isCompleted,
     index,

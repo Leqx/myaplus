@@ -4,6 +4,81 @@ import { devtools } from 'zustand/middleware';
 import { createSelectorHooks } from 'auto-zustand-selectors-hook';
 import { WritableDraft } from 'immer/dist/internal';
 
+import { createStore } from 'zustand-immer-store';
+
+export interface IProduct {
+  id: string;
+  name: string;
+  description: string;
+  img: string;
+  price: number;
+  category: string;
+  discount: number;
+  amount: number;
+  available: boolean;
+}
+
+export interface ICart {
+  product: IProduct;
+  total: number;
+}
+
+const useCounterStore = createStore(
+  { products: [] as IProduct[], cart: [] as IProduct[] },
+  {
+    createActions: (set) => ({
+      addToCart: (product: IProduct) =>
+        set((draft) => {
+          const productExists = draft.state.cart.find(
+            (x) => x.name === product.name
+          );
+          if (!productExists) {
+            draft.state.cart.push(product);
+            product.amount = 1;
+          }
+        }),
+      removeItemFromCart: (id: string) =>
+        set((draft) => {
+          const idx = draft.state.cart.findIndex((x) => x.id === id);
+          draft.state.cart.splice(idx, 1);
+        }),
+      clearCart: () =>
+        set((draft) => {
+          draft.state.cart = [];
+        }),
+      changeCartQty: (id: string) =>
+        set((draft) => {
+          draft.state;
+          console.log('change cart qty');
+        }),
+      cartTotal: () =>
+        set((draft) => {
+          draft.state.cart.reduce((acc, prod) => (acc += prod.amount), 0);
+        }),
+      sortByPrice: () =>
+        set((draft) => {
+          draft.state;
+          console.log('sorted by price');
+        }),
+      filterByStock: () =>
+        set((draft) => {
+          draft.state;
+          console.log('filtered by stock');
+        }),
+      filterBySearch: () =>
+        set((draft) => {
+          draft.state;
+          console.log('filtered by search');
+        }),
+      clearFilters: () =>
+        set((draft) => {
+          draft.state;
+          console.log('cleared filters');
+        }),
+    }),
+  }
+);
+
 export interface IProduct {
   id: string;
   name: string;

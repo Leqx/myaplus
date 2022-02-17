@@ -27,7 +27,10 @@ import { View } from '../components/Themed';
 import moment from 'moment';
 
 import { RootTabScreenProps } from '../types';
-import { useScheduleStore } from '../store/schedule/scheduleStore';
+import {
+  useScheduleStore,
+  useTodoStore,
+} from '../store/schedule/scheduleStore';
 import ListItem from '../components/listItem/ListItem';
 import { TODOS, ITodo } from '../store/schedule/todo';
 
@@ -82,6 +85,8 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
   const addTodo = useScheduleStore((state) => state.addTodo);
   const removeTodo = useScheduleStore((state) => state.removeTodo);
   const updateTodo = useScheduleStore((state) => state.updateTodo);
+
+  const { state, actions } = useTodoStore();
   ///// End ////
 
   ///// CalendarStrip ////
@@ -159,7 +164,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
           <ScrollView
             ref={scrollRef}
             style={{ flex: 1, height: '100%', paddingVertical: 10 }}>
-            {todos
+            {state.todos
               .filter((todo) => todo.isScheduled == true)
               .map((todo) => (
                 <ListItem

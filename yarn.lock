@@ -15702,13 +15702,6 @@ react-native-maps@0.28.0:
   dependencies:
     "@types/geojson" "^7946.0.7"
 
-react-native-modal-datetime-picker@^12.0.0:
-  version "12.0.0"
-  resolved "https://registry.npmjs.org/react-native-modal-datetime-picker/-/react-native-modal-datetime-picker-12.0.0.tgz"
-  integrity sha512-FzEXTcclTtnRLHDZS3lr4vKGqK0y1ZTjvHDowJmUiyxzwPLCiZaiQGHwYNa01EMwbRclEtO0p3fxLAZZX63L9A==
-  dependencies:
-    prop-types "^15.7.2"
-
 react-native-modal-datetime-picker@^7.4.2:
   version "7.6.1"
   resolved "https://registry.yarnpkg.com/react-native-modal-datetime-picker/-/react-native-modal-datetime-picker-7.6.1.tgz#463eaece1af98aa0b2fce00dab6cd203f89b86da"
@@ -18313,6 +18306,11 @@ use@^3.1.0:
   resolved "https://registry.npmjs.org/use/-/use-3.1.1.tgz"
   integrity sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ==
 
+usehooks-ts@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/usehooks-ts/-/usehooks-ts-2.4.0.tgz#8869a02da86baba01d5dad8bc2bd6361342d31dd"
+  integrity sha512-xj8ugb9fhqKQuS7Ns4JVIwV+ahtQdFdxgs4j4yUXErjVKUj0KideqxrHZ+GYu3DZSKDPO1PKZSijVCPs2ADFsA==
+
 utif@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/utif/-/utif-2.0.1.tgz"
@@ -19024,6 +19022,11 @@ yup@^0.32.11:
     nanoclone "^0.2.1"
     property-expr "^2.0.4"
     toposort "^2.0.2"
+
+zustand-immer-store@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/zustand-immer-store/-/zustand-immer-store-0.8.2.tgz#90d4427f771f3e740e5a6c622cfdea7dd2ced12e"
+  integrity sha512-qCW+IuRiYZFKSz9F6s6H4cN1+0gzQYlacCgfmjPL9a3SKw4ZQuxPQETP2h23GL94aZdjlzBQ/EliWhSXp9jcYg==
 
 zustand@^3.5.13:
   version "3.5.13"

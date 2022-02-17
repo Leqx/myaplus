@@ -72,7 +72,6 @@
     "react-native-gesture-handler": "~1.10.2",
     "react-native-get-random-values": "^1.7.0",
     "react-native-maps": "0.28.0",
-    "react-native-modal-datetime-picker": "^12.0.0",
     "react-native-modalize": "^2.0.13",
     "react-native-pager-view": "5.0.12",
     "react-native-rapi-ui": "^0.2.1",
@@ -90,9 +89,11 @@
     "sentry-expo": "^4.0.0",
     "styled-components": "^5.3.1",
     "styled-system": "^5.1.5",
+    "usehooks-ts": "^2.4.0",
     "uuid": "^8.3.2",
     "yup": "^0.32.11",
-    "zustand": "^3.5.13"
+    "zustand": "^3.5.13",
+    "zustand-immer-store": "^0.8.2"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

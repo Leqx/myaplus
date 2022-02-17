@@ -29,6 +29,7 @@ import ScheduleScreen from '../screens/ScheduleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import ServicesScreen from '../screens/ServicesScreen';
 import CreateScheduleScreen from '../screens/CreateScheduleScreen';
+import UpdateScheduleScreen from '../screens/UpdateScheduleScreen';
 import {
   RootStackParamList,
   RootTabParamList,
@@ -141,6 +142,11 @@ function ScheduleStackNavigator() {
       <ScheduleStack.Screen
         name='CreateSchedule'
         component={CreateScheduleScreen}
+        options={{ headerShown: false }}
+      />
+      <ScheduleStack.Screen
+        name='UpdateSchedule'
+        component={UpdateScheduleScreen}
         options={{ headerShown: false }}
       />
     </ScheduleStack.Navigator>

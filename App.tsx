@@ -17,6 +17,8 @@ import ScheduleState from './context/schedule/ScheduleState';
 
 import { AuthProvider as Auth } from './auth/provider/AuthProvider';
 
+import TodoProvider from './context/todo/todo-context';
+
 // TODO: Remove all unused packages
 
 const App = () => {
@@ -29,12 +31,14 @@ const App = () => {
     return (
       <ThemeProvider theme='dark'>
         <Auth>
-          <SafeAreaProvider>
-            <ScheduleState>
-              <Navigation colorScheme={colorScheme} />
-              <StatusBar />
-            </ScheduleState>
-          </SafeAreaProvider>
+          <TodoProvider>
+            <SafeAreaProvider>
+              <ScheduleState>
+                <Navigation colorScheme={colorScheme} />
+                <StatusBar />
+              </ScheduleState>
+            </SafeAreaProvider>
+          </TodoProvider>
         </Auth>
       </ThemeProvider>
     );

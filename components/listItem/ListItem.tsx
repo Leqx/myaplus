@@ -14,6 +14,11 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { ITodo } from '../../store/schedule/todo';
+import {
+  NavigatorScreenParams,
+  RouteProp,
+  useNavigation,
+} from '@react-navigation/native';
 
 import {
   Layout,
@@ -52,6 +57,7 @@ const ListItem: React.FC<ListItemProps> = ({
   const itemHeight = useSharedValue(LIST_ITEM_HEIGHT);
   const marginVertical = useSharedValue(10);
   const opacity = useSharedValue(1);
+  const navigation = useNavigation();
 
   const panGesture = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
     onActive: (event) => {
@@ -151,7 +157,7 @@ const ListItem: React.FC<ListItemProps> = ({
           <View style={{ marginHorizontal: 4 }}>
             <Button
               text='Update'
-              onPress={() => console.log('Update')}
+              onPress={() => navigation.navigate('UpdateSchedule')}
               rightContent={
                 <MaterialCommunityIcons
                   name='update'

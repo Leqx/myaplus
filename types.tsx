@@ -25,6 +25,7 @@ export type CreateScheduleParams = {
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   CreateSchedule: undefined;
+  UpdateSchedule: undefined;
   Modal: undefined;
   NotFound: undefined;
   Services: undefined;
