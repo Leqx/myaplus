@@ -6,7 +6,7 @@ import create, {
   StoreApi,
 } from 'zustand';
 import produce, { Draft } from 'immer';
-import { devtools } from 'zustand/middleware';
+// import { devtools } from 'zustand/middleware';
 import { createSelectorHooks } from 'auto-zustand-selectors-hook';
 import { WritableDraft } from 'immer/dist/internal';
 import { ITodo, TODOS } from './todo';
@@ -127,7 +127,7 @@ const scheduleStore = (set: ScheduleStoreSet) => ({
 });
 
 export const useScheduleStore = createSelectorHooks(
-  create<TodoState>(devtools(immer(scheduleStore)))
+  create<TodoState>(immer(scheduleStore))
 );
 
 // const immer =

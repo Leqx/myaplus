@@ -1,6 +1,6 @@
 import create, { State, StateCreator } from 'zustand';
 import produce, { Draft } from 'immer';
-import { devtools } from 'zustand/middleware';
+//import { devtools } from 'zustand/middleware';
 import { createSelectorHooks } from 'auto-zustand-selectors-hook';
 import { WritableDraft } from 'immer/dist/internal';
 
@@ -200,7 +200,7 @@ const productStore = (set: ProductStoreSet) => ({
 });
 
 export const useProductStore = createSelectorHooks(
-  create<TProductState>(devtools(immer(productStore)))
+  create<TProductState>(immer(productStore))
 );
 
 // export const useProductStore = create<TProductStore>((set) => ({

@@ -59,7 +59,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import { useScheduleStore } from '../store/schedule/scheduleStore';
+import { useTodoAppContext } from '../context/todo/todo-context';
 
 export default function Navigation({
   colorScheme,
@@ -186,11 +186,13 @@ const BottomTab = createBottomTabNavigator<RootTabParamList>();
 function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
-  const todos = useScheduleStore((state) => state.todos);
+  const {
+    todoState: { todoData },
+  } = useTodoAppContext();
 
-  let scheduledTodos = todos.filter((todo) => todo.isScheduled == true);
+  let scheduledTodos = todoData.filter((todo) => todo.isScheduled == true);
   let numberOfScheduledTodos = scheduledTodos.length;
-  //  console.log(numberOfScheduledTodos);
+
   return (
     <BottomTab.Navigator
       initialRouteName='Explore'

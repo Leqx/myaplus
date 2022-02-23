@@ -33,6 +33,8 @@ import {
 } from '../store/schedule/scheduleStore';
 import ListItem from '../components/listItem/ListItem';
 import { TODOS, ITodo } from '../store/schedule/todo';
+import { useTodoAppContext } from '../context/todo/todo-context';
+import { deleteTodoItem } from '../context/todo/todo-funtions';
 
 const datesWhitelist = [
   {
@@ -80,6 +82,13 @@ const TASKS: TaskInterface[] = TITLES.map((title, index) => ({ title, index }));
 const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
   ///// Todo ////
 
+  const {
+    todoState: { todoData },
+    todoDispatch,
+  } = useTodoAppContext();
+
+  // console.log(todoData);
+
   // const [todos, setTodos] = useState(TODOS);
   const todos = useScheduleStore((state) => state.todos);
   const addTodo = useScheduleStore((state) => state.addTodo);
@@ -97,9 +106,10 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
   ///// Tasks ////
   const [tasks, setTasks] = useState(TASKS);
 
-  const onDismiss = useCallback((todos: ITodo) => {
+  const onDismiss = useCallback((todo) => {
     // setTodos((todo) => todo.filter((item) => item.id !== todos.id));
-    removeTodo(todos.id);
+    //removeTodo(todos.id);
+    deleteTodoItem(todoDispatch, todo.id);
   }, []);
 
   const scrollRef = useRef(null);
@@ -152,7 +162,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
           markedDates={markedDate}
           selectedDate={currentDate}
           onDateSelected={(date) => {
-            console.log('date selected');
+            // console.log(date);
           }}
         />
 
@@ -164,7 +174,7 @@ const ScheduleScreen = ({ navigation }: RootTabScreenProps<'Schedule'>) => {
           <ScrollView
             ref={scrollRef}
             style={{ flex: 1, height: '100%', paddingVertical: 10 }}>
-            {state.todos
+            {todoData
               .filter((todo) => todo.isScheduled == true)
               .map((todo) => (
                 <ListItem

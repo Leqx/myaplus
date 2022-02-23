@@ -145,8 +145,14 @@ const ListItem: React.FC<ListItemProps> = ({
           backgroundColor: themeColor.white,
           paddingVertical: 1,
         }}>
-        <Text style={{ textAlign: 'center', paddingVertical: 5 }}>
-          {todos.title} today @ 4.00p.m
+        <Text
+          style={{
+            textAlign: 'center',
+            paddingVertical: 5,
+            fontWeight: 'bold',
+            color: themeColor.primary,
+          }}>
+          {todos.title} @ {todos.time} on {todos.day}
         </Text>
         <View
           style={{
@@ -171,7 +177,9 @@ const ListItem: React.FC<ListItemProps> = ({
           <View style={{ marginHorizontal: 4 }}>
             <Button
               text={`Study ${todos.title}`}
-              onPress={() => console.log('navigate to unit')}
+              onPress={() =>
+                navigation.navigate({ name: 'Root', key: 'Explore' })
+              }
               rightContent={
                 <Ionicons
                   name='arrow-forward'

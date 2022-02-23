@@ -1,16 +1,7 @@
 const data = [
   {
     id: '001',
-    title: 'Accounting',
-    additionalInfo: '',
-    day: '',
-    time: '',
-    isScheduled: true,
-    isCompleted: false,
-  },
-  {
-    id: '002',
-    title: 'Microeconomics',
+    title: 'Slide Left to delete item',
     additionalInfo: '',
     day: '',
     time: '',

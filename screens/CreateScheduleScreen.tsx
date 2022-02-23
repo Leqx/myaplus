@@ -83,7 +83,7 @@ const CreateSchedule = () => {
       additionalInfo,
       day,
       time: moment(time).format('hh:mm A'),
-      isScheduled: false,
+      isScheduled: true,
       isCompleted: false,
     };
     addTodoItem(todoDispatch, todoItem);
@@ -91,6 +91,7 @@ const CreateSchedule = () => {
     setAdditionalInfo('');
     setDay('');
     setTime(new Date());
+    navigation.navigate({ name: 'Root', key: 'Schedule' });
   };
 
   const [taskText, setTaskText] = useState('');
