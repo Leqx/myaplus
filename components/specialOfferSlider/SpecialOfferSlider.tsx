@@ -1,12 +1,8 @@
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, Image } from 'react-native';
 
 import React from 'react';
 import { Section, themeColor } from 'react-native-rapi-ui';
-import Carousel from 'react-native-snap-carousel';
-import {
-  animatedStyles,
-  scrollInterpolator,
-} from '../../screens/utils/Animations';
+import Swiper from 'react-native-swiper';
 
 const SLIDER_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
@@ -15,39 +11,36 @@ const SPACING = 10;
 
 const { width } = Dimensions.get('screen');
 
-const DATA: readonly any[] = [];
-for (let i = 0; i < 10; i++) {
-  DATA.push(i);
-}
-
 const RADIUS = (1.5 * width) / 2;
 
 export default function SpecialOfferSlider(item: any) {
-  const [index, setIndex] = React.useState(0);
-
-  const _renderItem = (item: any) => {
-    return (
-      <View style={styles.itemContainer}>
-        <Text style={styles.itemLabel}>{`Special Offers`}</Text>
-      </View>
-    );
-  };
-
   return (
     <>
       <Section style={styles.specialOfferContainer}>
-        <Carousel
-          data={DATA}
-          sliderWidth={SLIDER_WIDTH}
-          itemWidth={ITEM_WIDTH}
-          containerCustomStyle={styles.carouselContainer}
-          inactiveSlideShift={0}
-          onSnapToItem={(index) => setIndex(index)}
-          scrollInterpolator={scrollInterpolator}
-          slideInterpolatedStyle={animatedStyles}
-          useScrollView={true}
-          renderItem={_renderItem}
-        />
+        <Swiper
+          style={styles.wrapper}
+          showsButtons={false}
+          autoplay={true}
+          activeDotColor={themeColor.primary}>
+          <View style={styles.slide1}>
+            <Image
+              style={{ width: width, height: '100%' }}
+              source={require('../../assets/products/slider.jpg')}
+            />
+          </View>
+          <View style={styles.slide2}>
+            <Image
+              style={{ width: width, height: '100%' }}
+              source={require('../../assets/products/slider2.jpg')}
+            />
+          </View>
+          <View style={styles.slide3}>
+            <Image
+              style={{ width: width, height: '100%' }}
+              source={require('../../assets/products/slider3.jpg')}
+            />
+          </View>
+        </Swiper>
       </Section>
     </>
   );
@@ -67,19 +60,28 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
 
-  carouselContainer: {
-    marginTop: 50,
-  },
-
-  itemContainer: {
-    width: ITEM_WIDTH,
-    height: ITEM_HEIGHT,
-    alignItems: 'center',
+  wrapper: {},
+  slide1: {
+    flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'dodgerblue',
+    alignItems: 'center',
+    backgroundColor: '#9DD6EB',
   },
-  itemLabel: {
-    color: 'white',
-    fontSize: 24,
+  slide2: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#97CAE5',
+  },
+  slide3: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#92BBD9',
+  },
+  text: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
   },
 });

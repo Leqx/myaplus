@@ -42,6 +42,8 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import LoginScreen from '../screens/LoginScreen';
 import Loading from '../screens/utils/Loading';
 import StoreScreen from '../screens/StoreScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Layout,
   Button,
@@ -60,6 +62,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useTodoAppContext } from '../context/todo/todo-context';
+import { useCartAppContext } from '../context/cart/cart-context';
 
 export default function Navigation({
   colorScheme,
@@ -86,14 +89,27 @@ export default function Navigation({
   }, [user]);
 
   // console.log(user);
+  const [isFirstLaunch, setIsFirstLaunch] = React.useState<boolean | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (isFirstLaunch == null) {
+      AsyncStorage.setItem('@alreadyLaunched', 'true'); // No need to wait for `setItem` to finish, although you might want to handle errors
+      setIsFirstLaunch(true);
+    } else {
+      setIsFirstLaunch(false);
+    }
+  }, [isFirstLaunch]);
 
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       {loading && <Loading />}
-      {!user && !loading && <AuthStackNavigator />}
-      {user && !loading && <RootNavigator />}
+      {isFirstLaunch && !loading && <OnboardingScreen />}
+      {!user && !loading && !isFirstLaunch && <AuthStackNavigator />}
+      {user && !loading && !isFirstLaunch && <RootNavigator />}
     </NavigationContainer>
   );
 }
@@ -193,6 +209,13 @@ function BottomTabNavigator() {
   let scheduledTodos = todoData.filter((todo) => todo.isScheduled == true);
   let numberOfScheduledTodos = scheduledTodos.length;
 
+  const {
+    cartState: { cartData },
+  } = useCartAppContext();
+  let cartItems = cartData.filter((item) => item.inCart == true);
+  let numberOfCartItems = cartItems.length;
+  console.log(numberOfCartItems);
+
   return (
     <BottomTab.Navigator
       initialRouteName='Explore'
@@ -252,6 +275,8 @@ function BottomTabNavigator() {
         options={{
           title: 'Store',
           headerShown: false,
+          tabBarBadge: numberOfCartItems,
+          tabBarBadgeStyle: { backgroundColor: themeColor.primary500 },
           tabBarLabelStyle: { color: themeColor.gray500 },
           tabBarIcon: ({ color }) => (
             <Fontisto name='shopping-bag-1' size={24} color={color} />

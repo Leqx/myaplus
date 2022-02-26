@@ -8,10 +8,10 @@ const data = [
     price: 200,
     quantity: 1,
     available: true,
-    inCart: false,
+    inCart: true,
   },
   {
-    id: '1',
+    id: '2',
     name: 'Pencil',
     category: '',
     description: '',
@@ -19,7 +19,7 @@ const data = [
     price: 100,
     quantity: 1,
     available: true,
-    inCart: false,
+    inCart: true,
   },
 ];
 

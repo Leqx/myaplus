@@ -11,6 +11,9 @@ import {
 import { View } from '../../components/Themed';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useProductStore } from '../../store/product/productStore';
+import { useCartAppContext } from '../../context/cart/cart-context';
+import { addCartItem } from '../../context/cart/cart-funtions';
+import { IcartDataType } from '../../context/cart/cart-state';
 const { width } = Dimensions.get('screen');
 
 const image = { uri: 'https://via.placeholder.com/300/09f/fff.png' };
@@ -24,11 +27,31 @@ type Item = {
   price: number;
   amount: number;
   available: boolean;
-  discount: number;
 };
 
-export default function ProductCard(item: Item) {
+export default function ProductCard(item: IcartDataType) {
   const addToCart = useProductStore((state) => state.addToCart);
+
+  const {
+    cartState: { cartData },
+    cartDispatch,
+  } = useCartAppContext();
+
+  const handleAddToCart = () => {
+    let cartItem = {
+      id: item.id,
+      name: item.name,
+      category: item.category,
+      description: item.description,
+      img: item.img,
+      price: item.price,
+      quantity: 1,
+      available: true,
+      inCart: true,
+    };
+
+    addCartItem(cartDispatch, cartItem);
+  };
   return (
     <>
       <SectionContent style={styles.slider}>
@@ -43,7 +66,7 @@ export default function ProductCard(item: Item) {
         </View>
 
         <ImageBackground
-          source={image}
+          source={JSON.parse(item.img)}
           resizeMode='cover'
           style={styles.image}
         />
@@ -61,7 +84,7 @@ export default function ProductCard(item: Item) {
             status='primary'
             type='TouchableOpacity'
             size='md'
-            onPress={() => addToCart(item)}
+            onPress={() => handleAddToCart()}
           />
         </Section>
       </SectionContent>

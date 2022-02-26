@@ -30,6 +30,7 @@ import CarPoolModal from '../modals/carPool/CarPoolModal';
 import CartModal from '../modals/cart/CartModal';
 import ProductFilterModal from '../modals/productFilter/ProductFilterModal';
 import { useProductStore } from '../store/product/productStore';
+import { useCartAppContext } from '../context/cart/cart-context';
 
 const SLIDER_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
@@ -88,6 +89,11 @@ export default function StoreScreen() {
 
   const products = useProductStore((state) => state.products);
 
+  const {
+    cartState: { cartData },
+    cartDispatch,
+  } = useCartAppContext();
+
   const [bannerAdId, setBannerAdId] = React.useState<string>(
     Platform.OS === 'ios'
       ? 'ca-app-pub-3940256099942544/2934735716'
@@ -100,44 +106,66 @@ export default function StoreScreen() {
       name: 'pencil',
       description: 'this is a description',
       category: 'pencil',
-      img: 'https://via.placeholder.com/300/09f/fff.png',
+      img: require('../assets/products/pencil.jpg'),
       price: 20,
-      amount: 1,
+      quantity: 1,
       available: true,
-      discount: 10,
+      inCart: false,
     },
     {
       id: '2',
-      name: 'book',
+      name: 'note book',
       description: 'this is a description',
       category: 'book',
-      img: 'https://via.placeholder.com/300/09f/fff.png',
+      img: require('../assets/products/notepad.jpg'),
       price: 30,
-      amount: 1,
+      quantity: 1,
       available: true,
-      discount: 10,
+      inCart: false,
     },
     {
       id: '3',
       name: 'pen',
       description: 'this is a description',
       category: 'pen',
-      img: 'https://via.placeholder.com/300/09f/fff.png',
+      img: require('../assets/products/pen.jpg'),
       price: 25,
-      amount: 1,
+      quantity: 1,
       available: true,
-      discount: 10,
+      inCart: false,
     },
     {
       id: '4',
-      name: 'set',
+      name: 'calculator',
       description: 'this is a description',
       category: 'set',
-      img: 'https://via.placeholder.com/300/09f/fff.png',
-      price: 100,
-      amount: 1,
+      img: require('../assets/products/calculator.jpg'),
+      price: 1000,
+      quantity: 1,
       available: true,
-      discount: 10,
+      inCart: false,
+    },
+    {
+      id: '5',
+      name: 'eraser',
+      description: 'this is a description',
+      category: 'eraser',
+      img: require('../assets/products/eraser.jpg'),
+      price: 1000,
+      quantity: 1,
+      available: true,
+      inCart: false,
+    },
+    {
+      id: '6',
+      name: 'sharpener',
+      description: 'this is a description',
+      category: 'sharpener',
+      img: require('../assets/products/sharpener.jpg'),
+      price: 1000,
+      quantity: 1,
+      available: true,
+      inCart: false,
     },
   ]);
 
@@ -149,39 +177,32 @@ export default function StoreScreen() {
 
   return (
     <Layout>
-      {/*
       <>
         <SpecialOfferSlider />
       </>
-      */}
 
-      {/*
       <>
         <CarPoolModal
           modalOpen={modalOpenCarPool}
           setModalOpen={setModalOpenCarPool}
         />
       </>
-      */}
 
-      {/*
       <>
         <CartModal modalOpen={modalOpenCart} setModalOpen={setModalOpenCart} />
       </>
-      */}
 
-      {/*
-       <>
+      <>
         <ProductFilterModal
           modalOpen={modalOpenFilter}
           setModalOpen={setModalOpenFilter}
         />
       </>
-      */}
-      <Section
+
+      {/* <Section
         style={{ flex: 0.5, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={styles.title}>Under Construction</Text>
-      </Section>
+      </Section> */}
 
       <Section style={styles.header}>
         <AdMobBanner
@@ -192,8 +213,7 @@ export default function StoreScreen() {
         />
       </Section>
 
-      {/*
-       <Section style={styles.productHeader}>
+      <Section style={styles.productHeader}>
         <FlatList
           data={productData}
           horizontal
@@ -209,10 +229,8 @@ export default function StoreScreen() {
           keyExtractor={(item) => item.id}
         />
       </Section>
-       */}
 
-      {/*
-       <View style={styles.fab}>
+      <View style={styles.fab}>
         <FloatingAction
           actions={actions}
           showBackground={true}
@@ -244,7 +262,6 @@ export default function StoreScreen() {
           }}
         />
       </View>
-       */}
     </Layout>
   );
 }
@@ -282,7 +299,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   header: {
-    flex: 1,
+    flex: 0.5,
     width: width,
     backgroundColor: themeColor.white,
     borderBottomRightRadius: 0,
